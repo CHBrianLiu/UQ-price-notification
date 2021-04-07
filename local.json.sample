@@ -1,0 +1,9 @@
+{
+    "line": {
+        "line_channel_id": "",
+        "line_channel_secret": ""
+    },
+    "logging": {
+        "level": "debug"
+    }
+}
