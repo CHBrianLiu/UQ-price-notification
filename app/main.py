@@ -1,6 +1,9 @@
-from app.config.loader import get_config_by_key
 import logging
+
 from fastapi import FastAPI
+
+from app.config.loader import get_config_by_key
+from app.line import webhook
 
 app = FastAPI()
 logger = logging.getLogger()
@@ -18,6 +21,4 @@ else:
     # Default is error
     logger.setLevel(logging.ERROR)
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+app.include_router(webhook.router)
