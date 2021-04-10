@@ -1,4 +1,7 @@
 {
+    "local": {
+        "testing": false
+    },
     "line": {
         "reply_endpoint": "https://api.line.me/v2/bot/message/reply",
         "push_endpoint": "https://api.line.me/v2/bot/message/push"

@@ -10,6 +10,9 @@ from fastapi import Header, Request
 from fastapi.exceptions import HTTPException
 
 
+is_local_testing = get_config_by_key("local.testing")
+
+
 async def validate_signature(
     request: Request, x_line_signature: Optional[str] = Header(None)
 ):
@@ -25,5 +28,7 @@ async def validate_signature(
 
 
 async def validate_destination(body: data_models.LineRequest):
-    if body.destination != get_config_by_key("line.line_bot_user_id"):
+    if not is_local_testing and body.destination != get_config_by_key(
+        "line.line_bot_user_id"
+    ):
         raise HTTPException(status_code=400, detail="Wrong destination")

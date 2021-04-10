@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 from typing_extensions import TypedDict
 
 from pydantic import BaseModel
@@ -29,7 +29,7 @@ class WebhookEvent(TypedDict):
 
 
 class LineRequest(BaseModel):
-    destination: str
+    destination: Optional[str]
     events: List[
         Dict[str, Union[str, dict, Union[UserSource, GroupSource, RoomSource]]]
     ]
