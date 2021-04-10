@@ -10,14 +10,14 @@ UQ_URL_PREFIX = get_config_by_key("uq.product_url_prefix")
 async def handle_event(event: data_models.EventType) -> None:
     # Message event
     if event.get("type", "") == "message":
-        handle_message_event(event)
+        await handle_message_event(event)
 
 
 async def handle_message_event(message_event: data_models.EventType):
     message_info = message_event.get("message", {})
 
     if message_info.get("type", "") == "text":
-        handle_message_text_event(message_event)
+        await handle_message_text_event(message_event)
 
 
 async def handle_message_text_event(message_event: data_models.EventType):
