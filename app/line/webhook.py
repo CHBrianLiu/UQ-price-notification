@@ -11,7 +11,8 @@ router = APIRouter()
     path="/line/webhook",
     dependencies=[
         Depends(validator.validate_signature),
-        Depends(validator.validate_destination),
+        # ? disable destination validation due to destination value spec unclear.
+        # Depends(validator.validate_destination),
     ],
 )
 async def receive_line_webhook(body: data_models.LineRequest):

@@ -10,9 +10,6 @@ from fastapi import Header, Request
 from fastapi.exceptions import HTTPException
 
 
-is_local_testing = get_config_by_key("local.testing")
-
-
 async def validate_signature(
     request: Request, x_line_signature: Optional[str] = Header(None)
 ):
@@ -22,13 +19,19 @@ async def validate_signature(
         hmac.new(channel_secret.encode("utf-8"), body, hashlib.sha256).digest()
     ).decode("utf-8")
 
+    logging.debug(
+        "computed signature: %s. received signature: %s", signature, x_line_signature
+    )
+
     if x_line_signature is None or signature != x_line_signature:
         logging.warning("Get request with faulty signature.")
         raise HTTPException(status_code=400, detail="Wrong signature")
 
 
 async def validate_destination(body: data_models.LineRequest):
-    if not is_local_testing and body.destination != get_config_by_key(
-        "line.line_bot_user_id"
-    ):
+    bot_user_id = get_config_by_key("line.line_bot_user_id")
+    logging.debug(
+        "bot_user_id: %s. Request body destination: %s", bot_user_id, body.destination
+    )
+    if body.destination is not None and body.destination != bot_user_id:
         raise HTTPException(status_code=400, detail="Wrong destination")
