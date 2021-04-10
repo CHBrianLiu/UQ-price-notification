@@ -1,9 +1,18 @@
 {
     "line": {
-        "line_channel_id": "",
-        "line_channel_secret": ""
+        "reply_endpoint": "https://api.line.me/v2/bot/message/reply",
+        "push_endpoint": "https://api.line.me/v2/bot/message/push"
     },
     "logging": {
-        "level": "info"
+        "level": "error"
+    },
+    "azure": {
+        "account": {},
+        "storage_table": {
+            "table_name": "products"
+        }
+    },
+    "uq": {
+        "product_url_prefix": "https://www.uniqlo.com/tw/store/goods/"
     }
 }

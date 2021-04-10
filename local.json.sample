@@ -1,10 +1,19 @@
 {
     "line": {
-        "line_channel_id": "",
+        "line_bot_user_id": "",
         "line_channel_secret": "",
         "line_channel_token": ""
     },
     "logging": {
         "level": "debug"
+    },
+    "azure": {
+        "account": {
+            "account_name": "devstoreaccount1",
+            "account_access_key": "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
+        },
+        "storage_table": {
+            "connection_string": ""
+        }
     }
 }

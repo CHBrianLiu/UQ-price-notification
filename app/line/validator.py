@@ -25,5 +25,5 @@ async def validate_signature(
 
 
 async def validate_destination(body: data_models.LineRequest):
-    if body.destination != get_config_by_key("line.line_channel_id"):
+    if body.destination != get_config_by_key("line.line_bot_user_id"):
         raise HTTPException(status_code=400, detail="Wrong destination")
