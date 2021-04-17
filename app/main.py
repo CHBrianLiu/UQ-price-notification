@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from app.config.loader import get_config_by_key
 from app.line import webhook
+from app.models.setup import setup_azure_blob
 
 app = FastAPI()
 logger = logging.getLogger()
@@ -20,5 +21,8 @@ elif log_level == "debug":
 else:
     # Default is error
     logger.setLevel(logging.ERROR)
+    
+# setup_database
+setup_azure_blob()
 
 app.include_router(webhook.router)
