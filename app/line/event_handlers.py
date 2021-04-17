@@ -1,8 +1,8 @@
-import re
 from typing import Dict, Union
 
 from app.config.loader import get_config_by_key
 from app.line import data_models, reply
+from app.line.actions import add_tracking_product
 
 UQ_URL_PREFIX = get_config_by_key("uq.product_url_prefix")
 
@@ -23,6 +23,7 @@ async def handle_message_event(message_event: data_models.EventType):
 async def handle_message_text_event(message_event: data_models.EventType):
     message_info = message_event.get("message", {})
     text_content = message_info.get("text", "")
+    user_id = message_event.get("source", {}).get("userId", "")
 
     if text_content.upper().startswith("LIST") or text_content.startswith("清單"):
         # List all the client's tracked products.
@@ -32,7 +33,9 @@ async def handle_message_text_event(message_event: data_models.EventType):
         await reply.reply_delete_message(message_event)
     elif text_content.startswith(UQ_URL_PREFIX):
         # Track this product.
-        await reply.reply_add_message(message_event)
+        product_id = text_content[len(UQ_URL_PREFIX):]
+        response = await add_tracking_product(user_id, product_id)
+        await reply.reply_add_message(message_event, response)
     else:
         # Show help message
         await reply.reply_help_message(message_event)
