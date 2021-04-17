@@ -10,9 +10,15 @@
         "level": "error"
     },
     "azure": {
-        "account": {},
-        "storage_table": {
-            "table_name": "products"
+        "account": {
+            "name": "",
+            "access_key": ""
+        },
+        "blob": {
+            "containers": [
+                "users",
+                "products"
+            ]
         }
     },
     "uq": {
