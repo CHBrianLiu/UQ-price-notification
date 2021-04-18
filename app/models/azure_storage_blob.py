@@ -1,3 +1,6 @@
+import json
+from typing import List
+
 from app.config.loader import get_config_by_key
 from azure.storage.blob import BlobType, ContainerClient
 
@@ -40,6 +43,26 @@ def upload_file_to_container(
 def does_file_exist(container: str, file_name: str):
     container_client = _get_client_by_name(container)
     return container_client.get_blob_client(file_name).exists()
+
+
+def get_all_users() -> List[str]:
+    container_client = _get_client_by_name("users")
+    files = [blob.name for blob in container_client.list_blobs()]
+    return [name[:-5] for name in files]
+
+
+def get_all_products() -> List[str]:
+    container_client = _get_client_by_name("products")
+    files = [blob.name for blob in container_client.list_blobs()] 
+    return [name[:-5] for name in files]
+
+
+def get_price_down_products() -> List[str]:
+    return json.loads(get_file_from_container("notification", "price-down.json"))
+
+
+def update_price_down_products(products: List[str]):
+    upload_file_to_container("notification", "price-down.json", json.dumps(products))
 
 
 def _get_client_by_name(container: str) -> ContainerClient:

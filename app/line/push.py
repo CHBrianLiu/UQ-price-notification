@@ -1,9 +1,11 @@
 import json
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import aiohttp
 from app.config.loader import get_config_by_key
+from app.line import data_models
+from app.line.push_messages import price_down_messages
 
 
 async def push(
@@ -32,3 +34,10 @@ async def push(
                     response.status,
                     json_body,
                 )
+
+
+async def push_price_down_message(
+    user_id: str, response: Tuple[str, Dict[str, Any]]
+):
+    message = price_down_messages.messages[response[0]].format(**(response[1]))
+    await push(user_id, [{"type": "text", "text": message}])

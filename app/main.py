@@ -1,10 +1,13 @@
+import asyncio
 import logging
+import asyncio
 
 from fastapi import FastAPI
 
 from app.config.loader import get_config_by_key
 from app.line import webhook
 from app.models.setup import setup_azure_blob
+from app.cron import uq_scheduler
 
 app = FastAPI()
 logger = logging.getLogger()
@@ -24,5 +27,8 @@ else:
     
 # setup_database
 setup_azure_blob()
+
+# start scheduler
+asyncio.create_task(uq_scheduler.scheduler())
 
 app.include_router(webhook.router)
