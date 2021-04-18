@@ -17,11 +17,7 @@ account_key = (
 
 
 def setup_azure_blob():
-    blob_service_client = BlobServiceClient(
-        account_url, account_key
-    )
+    blob_service_client = BlobServiceClient(account_url, account_key)
     for container in azure_config.get("blob", {}).get("containers", []):
         if not blob_service_client.get_container_client(container).exists():
-            blob_service_client.create_container(
-                container, public_access=PublicAccess.OFF
-            )
+            blob_service_client.create_container(container)
