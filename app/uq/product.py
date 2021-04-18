@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import Any, Dict, List, Union
 
 import aiohttp
 from attr import attributes
@@ -9,7 +9,7 @@ from app.requests_html_cxt_mgr.session import AsyncHTMLSessionCxt
 
 
 class UqProduct:
-    uq_config: str = get_config_by_key("uq")
+    uq_config: Dict[str, Union[str, List[str]]] = get_config_by_key("uq")
     UQ_URL_PREFIX: str = uq_config.get("product_url_prefix", "")
     PRODUCT_NAME_CSS_SELECTOR: str = uq_config.get("product_name_css", "")
     PRODUCT_ICON_LIST_CSS_SELECTOR: str = uq_config.get("icon_list_css", "")
