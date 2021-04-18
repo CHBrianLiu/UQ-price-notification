@@ -22,6 +22,14 @@
         }
     },
     "uq": {
-        "product_url_prefix": "https://www.uniqlo.com/tw/store/goods/"
+        "product_url_prefix": "https://www.uniqlo.com/tw/store/goods/",
+        "product_name_css": "#goodsNmArea",
+        "icon_list_css": "#goodsIconList",
+        "on_sale_icon_css_list": [
+            "#limitedTime",
+            "#priceDown",
+            "#onlineOnlyIcon"
+        ],
+        "hide_icon_style": "display: none;"
     }
 }
