@@ -5,15 +5,20 @@ from typing import Any, Dict, Tuple
 from app.config.loader import get_config_by_key
 from app.models import azure_storage_blob
 from app.models.templates import users
-from app.uq.utils import get_product_page, get_product_name
+from app.uq.product import UqProduct
 
 
-async def add_tracking_product(user_id: str, product_id: str) -> Tuple[str, Dict[str, Any]]:
-    # check if product is on-sale
-    product_page = await get_product_page(product_id)
-    if product_page is None:
+async def add_tracking_product(
+    user_id: str, product_id: str
+) -> Tuple[str, Dict[str, Any]]:
+    product = await UqProduct.create(product_id)
+
+    if product.page is None:
         return ("not_found", {})
-    product_name = get_product_name(product_page)
+
+    # check if product is on-sale
+    if await product.is_product_on_sale():
+        return ("on_sale", {"title": product.product_name})
 
     # Get user record
     user_container = "users"
@@ -30,7 +35,7 @@ async def add_tracking_product(user_id: str, product_id: str) -> Tuple[str, Dict
 
     # Product has been tracked
     if product_id in user_record_content["product_tracking"]:
-        return ("in_list", {"title": product_name})
+        return ("in_list", {"title": product.product_name})
     user_record_content["product_tracking"] += [product_id]
     user_record_content["count_tracking"] += 1
 
@@ -47,4 +52,4 @@ async def add_tracking_product(user_id: str, product_id: str) -> Tuple[str, Dict
         user_container, user_record, json.dumps(user_record_content)
     )
 
-    return ("tracking", {"title": product_name})
+    return ("tracking", {"title": product.product_name})
