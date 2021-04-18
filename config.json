@@ -17,7 +17,8 @@
         "blob": {
             "containers": [
                 "users",
-                "products"
+                "products",
+                "notification"
             ]
         }
     },
@@ -31,5 +32,9 @@
             "#onlineOnlyIcon"
         ],
         "hide_icon_style": "display: none;"
+    },
+    "cron": {
+        "price_checking": "00:00",
+        "notification_pushing": "00:30"
     }
 }
