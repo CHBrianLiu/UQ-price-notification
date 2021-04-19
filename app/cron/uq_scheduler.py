@@ -28,3 +28,8 @@ async def scheduler():
     while True:
         schedule.run_pending()
         await asyncio.sleep(600)
+
+def scheduler_entry():
+    with open("entry.txt", "w") as f:
+        pass
+    asyncio.run(scheduler())

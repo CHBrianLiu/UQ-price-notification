@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import asyncio
+import threading
 
 from fastapi import FastAPI
 
@@ -29,6 +30,10 @@ else:
 setup_azure_blob()
 
 # start scheduler
-asyncio.create_task(uq_scheduler.scheduler())
+# if asyncio.get_event_loop() is None:
+#     scheduler_event_loop = asyncio.new_event_loop().run_until_complete(uq_scheduler.scheduler())
+# else:
+#     asyncio.create_task(uq_scheduler.scheduler())
+threading.Thread(target=uq_scheduler.scheduler_entry).start()
 
 app.include_router(webhook.router)
