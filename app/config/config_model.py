@@ -17,8 +17,8 @@ class AppConfig(BaseModel):
 
     # AZURE
     AZURE_BLOB_CONTAINERS: List[str]
-    AZURE_ACOUNT_NAME: str
-    AZURE_ACOUNT_KEY: str
+    AZURE_ACCOUNT_NAME: str
+    AZURE_ACCOUNT_KEY: str
 
     # UQ
     UQ_PRODUCT_URL_PREFIX: str
