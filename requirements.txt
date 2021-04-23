@@ -1,6 +1,6 @@
 aiodns==2.0.0
 aiohttp==3.7.4.post0
-appdirs==1.4.4
+Gappdirs==1.4.4
 astroid==2.5.2
 async-timeout==3.0.1
 attrs==20.3.0
@@ -39,9 +39,9 @@ pycparser==2.20
 pydantic==1.8.1
 pyee==8.1.0
 pylint==2.7.4
-pyodbc==4.0.30
 pyppeteer==0.2.5
 pyquery==1.4.3
+python-dotenv==0.17.0
 regex==2021.4.4
 requests==2.25.1
 requests-html==0.10.0
