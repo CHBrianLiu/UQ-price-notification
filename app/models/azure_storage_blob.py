@@ -5,12 +5,12 @@ from app.config import app_config
 from azure.storage.blob import BlobType, ContainerClient
 
 account_url = (
-    (f"https://{app_config.AZURE_ACOUNT_NAME}.blob.core.windows.net")
+    (f"https://{app_config.AZURE_ACCOUNT_NAME}.blob.core.windows.net")
     if not app_config.LOCAL_TESTING
     else "http://127.0.0.1:10000/devstoreaccount1"
 )
 account_key = (
-    app_config.AZURE_ACOUNT_KEY
+    app_config.AZURE_ACCOUNT_KEY
     if not app_config.LOCAL_TESTING
     else "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
 )
