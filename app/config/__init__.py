@@ -1,6 +1,15 @@
+"""
+Application configuration global object
+
+Usage:
+    from app.config import app_config
+    app_config.<CONFIG>
+"""
+
 import json
-import dotenv
 import os
+
+import dotenv
 
 from .config_model import AppConfig
 
