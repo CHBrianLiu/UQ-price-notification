@@ -128,4 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-local.json
+# vs code
+.vscode
+
+# application
+*local.env
