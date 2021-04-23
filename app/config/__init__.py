@@ -19,6 +19,7 @@ LOCAL_ENV_PATH = os.path.join(os.path.dirname(__file__), "../../local.env")
 loaded_config = {
     **dotenv.dotenv_values(DEFAULT_ENV_PATH),
     **dotenv.dotenv_values(LOCAL_ENV_PATH),
+    **os.environ,
 }
 
 # manual conversion
