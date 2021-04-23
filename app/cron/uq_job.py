@@ -3,20 +3,17 @@ import json
 import logging
 from typing import List
 
-from app.config.loader import get_config_by_key
+from app.config import app_config
+from app.line.push import push_price_down_message
 from app.models.azure_storage_blob import (
     get_all_products,
-    update_price_down_products,
     get_all_users,
     get_file_from_container,
-    upload_file_to_container,
     get_price_down_products,
+    update_price_down_products,
+    upload_file_to_container,
 )
 from app.uq.product import UqProduct
-from app.line.push import push_price_down_message
-
-uq_config = get_config_by_key("uq")
-UQ_URL_PREFIX = uq_config.get("product_url_prefix", "")
 
 
 async def check_pricing():
@@ -67,7 +64,7 @@ async def _notify_one_user(user_id: str, target_products: List[str]):
             {
                 "links": "\n".join(
                     [
-                        f"{UQ_URL_PREFIX}{product_id}"
+                        f"{app_config.UQ_PRODUCT_URL_PREFIX}{product_id}"
                         for product_id in products_to_notify
                     ]
                 )

@@ -3,8 +3,7 @@ import logging
 from typing import Any, Dict, List, Tuple
 
 import aiohttp
-from app.config.loader import get_config_by_key
-from app.line import data_models
+from app.config import app_config
 from app.line.push_messages import price_down_messages
 
 
@@ -13,7 +12,7 @@ async def push(
     messages: List[Dict[str, Any]],
     notification_disabled: bool = False,
 ):
-    token = get_config_by_key("line.line_channel_token")
+    token = app_config.LINE_LINE_BOT_CHANNEL_TOKEN
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
 
     body = json.dumps(
@@ -24,7 +23,7 @@ async def push(
         }
     )
 
-    endpoint = get_config_by_key("line.push_endpoint")
+    endpoint = app_config.LINE_PUSH_ENDPOINT
     async with aiohttp.ClientSession() as session:
         async with session.post(url=endpoint, data=body, headers=headers) as response:
             if response.status != 200:

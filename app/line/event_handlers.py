@@ -1,10 +1,6 @@
-from typing import Dict, Union
-
-from app.config.loader import get_config_by_key
+from app.config import app_config
 from app.line import data_models, reply
 from app.line.actions import add_tracking_product
-
-UQ_URL_PREFIX = get_config_by_key("uq.product_url_prefix")
 
 
 async def handle_event(event: data_models.EventType) -> None:
@@ -31,9 +27,9 @@ async def handle_message_text_event(message_event: data_models.EventType):
     elif text_content.upper().startswith("DELETE") or text_content.startswith("刪除"):
         # Delete one tracked product.
         await reply.reply_delete_message(message_event)
-    elif text_content.startswith(UQ_URL_PREFIX):
+    elif text_content.startswith(app_config.UQ_PRODUCT_URL_PREFIX):
         # Track this product.
-        product_id = text_content[len(UQ_URL_PREFIX):]
+        product_id = text_content[len(app_config.UQ_PRODUCT_URL_PREFIX) :]
         response = await add_tracking_product(user_id, product_id)
         await reply.reply_add_message(message_event, response)
     else:

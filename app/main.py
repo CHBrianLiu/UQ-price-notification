@@ -1,19 +1,18 @@
 import asyncio
 import logging
-import asyncio
 import threading
 
 from fastapi import FastAPI
 
-from app.config.loader import get_config_by_key
+from app.config import app_config
+from app.cron import uq_scheduler
 from app.line import webhook
 from app.models.setup import setup_azure_blob
-from app.cron import uq_scheduler
 
 app = FastAPI()
 logger = logging.getLogger()
 
-log_level = get_config_by_key("logging.level")
+log_level = app_config.LOGGING_LEVEL
 if log_level == "critical":
     logger.setLevel(logging.CRITICAL)
 elif log_level == "warning":
@@ -25,7 +24,7 @@ elif log_level == "debug":
 else:
     # Default is error
     logger.setLevel(logging.ERROR)
-    
+
 # setup_database
 setup_azure_blob()
 

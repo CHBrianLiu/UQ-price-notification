@@ -3,7 +3,7 @@ import logging
 from typing import Any, Dict, List, Tuple
 
 import aiohttp
-from app.config.loader import get_config_by_key
+from app.config import app_config
 from app.line import data_models
 from app.line.reply_messages import add_messages
 
@@ -13,7 +13,7 @@ async def reply(
     messages: List[Dict[str, Any]],
     notification_disabled: bool = False,
 ):
-    token = get_config_by_key("line.line_channel_token")
+    token = app_config.LINE_LINE_BOT_CHANNEL_TOKEN
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
 
     body = json.dumps(
@@ -24,7 +24,7 @@ async def reply(
         }
     )
 
-    endpoint = get_config_by_key("line.reply_endpoint")
+    endpoint = app_config.LINE_REPLY_ENDPOINT
     async with aiohttp.ClientSession() as session:
         async with session.post(url=endpoint, data=body, headers=headers) as response:
             if response.status != 200:

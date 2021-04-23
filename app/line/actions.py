@@ -2,7 +2,6 @@ import json
 from copy import deepcopy
 from typing import Any, Dict, Tuple
 
-from app.config.loader import get_config_by_key
 from app.models import azure_storage_blob
 from app.models.templates import users
 from app.uq.product import UqProduct

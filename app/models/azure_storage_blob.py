@@ -1,26 +1,24 @@
 import json
 from typing import List
 
-from app.config.loader import get_config_by_key
+from app.config import app_config
 from azure.storage.blob import BlobType, ContainerClient
 
-testing = get_config_by_key("local.testing")
-azure_config = get_config_by_key("azure")
 account_url = (
-    (f"https://{azure_config.get('account', {}).get('name', '')}.blob.core.windows.net")
-    if not testing
+    (f"https://{app_config.AZURE_ACOUNT_NAME}.blob.core.windows.net")
+    if not app_config.LOCAL_TESTING
     else "http://127.0.0.1:10000/devstoreaccount1"
 )
 account_key = (
-    azure_config.get("account", {}).get("access_key", "")
-    if not testing
+    app_config.AZURE_ACOUNT_KEY
+    if not app_config.LOCAL_TESTING
     else "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
 )
 container_client_factory = {
     container_name: ContainerClient(
         account_url=account_url, container_name=container_name, credential=account_key
     )
-    for container_name in azure_config.get("blob", {}).get("containers", [])
+    for container_name in app_config.AZURE_BLOB_CONTAINERS
 }
 
 
@@ -53,7 +51,7 @@ def get_all_users() -> List[str]:
 
 def get_all_products() -> List[str]:
     container_client = _get_client_by_name("products")
-    files = [blob.name for blob in container_client.list_blobs()] 
+    files = [blob.name for blob in container_client.list_blobs()]
     return [name[:-5] for name in files]
 
 

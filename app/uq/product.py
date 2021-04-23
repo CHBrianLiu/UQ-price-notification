@@ -1,20 +1,18 @@
 import logging
-from typing import Any, Dict, List, Union
+from typing import List
 
 import aiohttp
-from attr import attributes
-from app.config.loader import get_config_by_key
 from requests_html import HTML
 from app.requests_html_cxt_mgr.session import AsyncHTMLSessionCxt
+from app.config import app_config
 
 
 class UqProduct:
-    uq_config: Dict[str, Union[str, List[str]]] = get_config_by_key("uq")
-    UQ_URL_PREFIX: str = uq_config.get("product_url_prefix", "")
-    PRODUCT_NAME_CSS_SELECTOR: str = uq_config.get("product_name_css", "")
-    PRODUCT_ICON_LIST_CSS_SELECTOR: str = uq_config.get("icon_list_css", "")
-    ON_SALE_ICONS: List[str] = uq_config.get("on_sale_icon_css_list", [])
-    HIDDEN_ICON_STYLE: str = uq_config.get("hide_icon_style", "")
+    UQ_URL_PREFIX: str = app_config.UQ_PRODUCT_URL_PREFIX
+    PRODUCT_NAME_CSS_SELECTOR: str = app_config.UQ_PRODUCT_NAME_CSS
+    PRODUCT_ICON_LIST_CSS_SELECTOR: str = app_config.UQ_ICON_LIST_CSS
+    ON_SALE_ICONS: List[str] = app_config.UQ_ON_SALE_ICON_CSS_LIST
+    HIDDEN_ICON_STYLE: str = app_config.UQ_HIDE_ICON_STYLE
 
     product_id: str
     page: str

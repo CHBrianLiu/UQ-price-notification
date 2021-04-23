@@ -3,21 +3,17 @@ import logging
 import time
 
 import schedule
-from app.config.loader import get_config_by_key
+from app.config import app_config
 from app.cron import uq_job
 
 
-@schedule.repeat(
-    schedule.every().day.at(get_config_by_key("cron.price_checking"))
-)
+@schedule.repeat(schedule.every().day.at(app_config.CRON_PRICE_CHECKING))
 def check_pricing():
     logging.info("Start to check products prices.")
     asyncio.create_task(uq_job.check_pricing())
 
 
-@schedule.repeat(
-    schedule.every().day.at(get_config_by_key("cron.notification_pushing"))
-)
+@schedule.repeat(schedule.every().day.at(app_config.CRON_NOTIFICATION_PUSHING))
 def push_notification():
     logging.info("Start to push notification.")
     asyncio.create_task(uq_job.notify())
@@ -28,6 +24,7 @@ async def scheduler():
     while True:
         schedule.run_pending()
         await asyncio.sleep(600)
+
 
 def scheduler_entry():
     with open("entry.txt", "w") as f:
