@@ -8,6 +8,7 @@ class AppConfig(BaseModel):
     # LINE ENDPOINTS
     LINE_REPLY_ENDPOINT: str
     LINE_PUSH_ENDPOINT: str
+    LINE_LINE_BOT_USER_ID: str
     LINE_LINE_BOT_CHANNEL_SECRET: str
     LINE_LINE_BOT_CHANNEL_TOKEN: str
 
