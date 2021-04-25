@@ -19,6 +19,8 @@ class AppConfig(BaseModel):
     AZURE_BLOB_CONTAINERS: List[str]
     AZURE_ACCOUNT_NAME: str
     AZURE_ACCOUNT_KEY: str
+    AZURE_APP_SERVICE_CALLBACK_ENABLED: bool  # Call itself to make app service awake
+    AZURE_WEB_APP_CALLBACK_URL: str
 
     # UQ
     UQ_PRODUCT_URL_PREFIX: str
