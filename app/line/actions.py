@@ -1,15 +1,16 @@
 import json
+import logging
 from copy import deepcopy
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
+from app.config import app_config
+from app.line.reply_messages import ResponseMessageType
 from app.models import azure_storage_blob
 from app.models.templates import users
 from app.uq.product import UqProduct
 
 
-async def add_tracking_product(
-    user_id: str, product_id: str
-) -> Tuple[str, Dict[str, Any]]:
+async def add_tracking_product(user_id: str, product_id: str) -> ResponseMessageType:
     product = await UqProduct.create(product_id)
 
     if product.page is None:
@@ -52,3 +53,30 @@ async def add_tracking_product(
     )
 
     return ("tracking", {"title": product.product_name})
+
+
+def list_tracking_products(user_id: str) -> ResponseMessageType:
+    # Retrieve usre data
+    user_record = azure_storage_blob.container_client_factory.get(
+        "users"
+    ).get_blob_client(f"{user_id}.json")
+    if not user_record.exists():
+        logging.info("No user %s data.", user_id)
+        return ("no_user", {})
+    # Fetch all items being tracked.
+    user_data = json.loads(user_record.download_blob().content_as_text())
+    tracking_items = user_data.get("product_tracking", [])
+    logging.debug("User %s's following items:\n%s", user_id, tracking_items)
+    if not tracking_items:
+        logging.info("User %s has no tracking item.", user_id)
+        return ("no_item", {})
+    return (
+        "following",
+        {"products": _compose_product_list_message(tracking_items)},
+    )
+
+
+def _compose_product_list_message(products: List[str]):
+    return "\n".join(
+        [f"{app_config.UQ_PRODUCT_URL_PREFIX}{product_id}" for product_id in products]
+    )

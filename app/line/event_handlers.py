@@ -1,6 +1,6 @@
 from app.config import app_config
 from app.line import data_models, reply
-from app.line.actions import add_tracking_product
+from app.line.actions import add_tracking_product, list_tracking_products
 
 
 async def handle_event(event: data_models.EventType) -> None:
@@ -23,7 +23,8 @@ async def handle_message_text_event(message_event: data_models.EventType):
 
     if text_content.upper().startswith("LIST") or text_content.startswith("清單"):
         # List all the client's tracked products.
-        await reply.reply_list_message(message_event)
+        response = list_tracking_products(user_id)
+        await reply.reply_list_message(message_event, response)
     elif text_content.upper().startswith("DELETE") or text_content.startswith("刪除"):
         # Delete one tracked product.
         await reply.reply_delete_message(message_event)

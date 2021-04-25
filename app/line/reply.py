@@ -5,7 +5,12 @@ from typing import Any, Dict, List, Tuple
 import aiohttp
 from app.config import app_config
 from app.line import data_models
-from app.line.reply_messages import add_messages
+from app.line.reply_messages import (
+    add_messages,
+    help_messages,
+    list_messages,
+    ResponseMessageType,
+)
 
 
 async def reply(
@@ -36,8 +41,11 @@ async def reply(
                 )
 
 
-async def reply_list_message(event: data_models.EventType):
-    await reply(event.get("replyToken", ""), [{"type": "text", "text": "目前你追蹤的商品："}])
+async def reply_list_message(
+    event: data_models.EventType, response: ResponseMessageType
+):
+    message = list_messages.messages[response[0]].format(**(response[1]))
+    await reply(event.get("replyToken", ""), [{"type": "text", "text": message}])
 
 
 async def reply_delete_message(event: data_models.EventType):
@@ -45,11 +53,14 @@ async def reply_delete_message(event: data_models.EventType):
 
 
 async def reply_add_message(
-    event: data_models.EventType, response: Tuple[str, Dict[str, Any]]
+    event: data_models.EventType, response: ResponseMessageType
 ):
     message = add_messages.messages[response[0]].format(**(response[1]))
     await reply(event.get("replyToken", ""), [{"type": "text", "text": message}])
 
 
 async def reply_help_message(event: data_models.EventType):
-    await reply(event.get("replyToken", ""), [{"type": "text", "text": "可用指令："}])
+    await reply(
+        event.get("replyToken", ""),
+        [{"type": "text", "text": help_messages.messages["help"]}],
+    )
