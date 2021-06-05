@@ -18,7 +18,7 @@ async def add_tracking_product(user_id: str, product_id: str) -> ResponseMessage
         return ("not_found", {})
 
     # check if product is on-sale
-    if await product.is_product_on_sale:
+    if product.is_product_on_sale:
         return ("on_sale", {"title": product.product_name})
 
     # Get user record
