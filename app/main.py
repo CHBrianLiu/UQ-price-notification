@@ -6,16 +6,12 @@ from fastapi import FastAPI
 from app.config import app_config
 from app.cron import callback_scheduler, uq_scheduler
 from app.line import webhook
-from app.models.setup import setup_azure_blob
 from app.utils import callback, logger
 
 app = FastAPI()
 
 # setup logger
 logger.set_global_logger_level()
-
-# setup_database
-setup_azure_blob()
 
 # start scheduler
 threading.Thread(target=uq_scheduler.scheduler_entry).start()

@@ -1,13 +1,12 @@
-import json
 import logging
-from copy import deepcopy
-from typing import Any, Dict, List, Tuple
+from typing import List
 
 from app.config import app_config
 from app.line.reply_messages import ResponseMessageType
-from app.models import azure_storage_blob
-from app.models.templates import users
-from app.uq.product import UqProduct, NoUqProduct
+from app.models.data_store import data_access
+from app.models.Product import Product
+from app.models.User import User
+from app.uq.product import NoUqProduct, UqProduct
 
 
 async def add_tracking_product(user_id: str, product_id: str) -> ResponseMessageType:
@@ -21,59 +20,45 @@ async def add_tracking_product(user_id: str, product_id: str) -> ResponseMessage
     if product.is_product_on_sale:
         return ("on_sale", {"title": product.product_name})
 
-    # Get user record
-    user_container = "users"
-    user_record = f"{user_id}.json"
-
     # Mew user, copy from template
-    if not azure_storage_blob.does_file_exist(user_container, user_record):
-        user_record_content = deepcopy(users.template)
-        user_record_content["user_id"] = user_id
-    else:
-        user_record_content = json.loads(
-            azure_storage_blob.get_file_from_container(user_container, user_record)
-        )
+    user_data = (
+        data_access.get_user_info(user_id)
+        if data_access.has_user(user_id)
+        else User(user_id=user_id, count_tracking=0, product_tracking=[])
+    )
 
     # Product has been tracked
-    if product_id in user_record_content["product_tracking"]:
+    if product_id in user_data.product_tracking:
         return ("in_list", {"title": product.product_name})
-    user_record_content["product_tracking"] += [product_id]
-    user_record_content["count_tracking"] += 1
+    user_data.product_tracking.add(product_id)
+    user_data.count_tracking += 1
 
     # Create product
-    product_container = "products"
-    product_record = f"{product_id}.json"
-    if not azure_storage_blob.does_file_exist(product_container, product_record):
-        azure_storage_blob.upload_file_to_container(
-            product_container, product_record, ""
-        )
+    if not data_access.is_product_tracked_by_any_user(product_id):
+        data_access.update_product(Product(product_id=product_id))
 
     # update user record
-    azure_storage_blob.upload_file_to_container(
-        user_container, user_record, json.dumps(user_record_content)
-    )
+    data_access.update_user(user_data)
 
     return ("tracking", {"title": product.product_name})
 
 
 def list_tracking_products(user_id: str) -> ResponseMessageType:
     # Retrieve usre data
-    user_record = azure_storage_blob.container_client_factory.get(
-        "users"
-    ).get_blob_client(f"{user_id}.json")
-    if not user_record.exists():
+    if not data_access.has_user(user_id):
         logging.info("No user %s data.", user_id)
         return ("no_user", {})
+    user_data = data_access.get_user_info(user_id)
     # Fetch all items being tracked.
-    user_data = json.loads(user_record.download_blob().content_as_text())
-    tracking_items = user_data.get("product_tracking", [])
-    logging.debug("User %s's following items:\n%s", user_id, tracking_items)
-    if not tracking_items:
+    logging.debug(
+        "User %s's following items:\n%s", user_data.user_id, user_data.product_tracking
+    )
+    if not user_data.product_tracking:
         logging.info("User %s has no tracking item.", user_id)
         return ("no_item", {})
     return (
         "following",
-        {"products": _compose_product_list_message(tracking_items)},
+        {"products": _compose_product_list_message(user_data.product_tracking)},
     )
 
 
