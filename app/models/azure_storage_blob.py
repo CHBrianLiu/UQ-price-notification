@@ -116,7 +116,7 @@ class AzureBlob(IDataStore):
             for container_name in (
                 self.user_container,
                 self.product_container,
-                self.product_container,
+                self.notification_container,
             )
         }
 
@@ -125,7 +125,7 @@ class AzureBlob(IDataStore):
         for container in (
             self.user_container,
             self.product_container,
-            self.product_container,
+            self.notification_container,
         ):
             if not blob_service_client.get_container_client(container).exists():
                 blob_service_client.create_container(container)
