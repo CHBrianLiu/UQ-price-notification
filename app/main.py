@@ -4,16 +4,15 @@ import threading
 from fastapi import FastAPI
 
 from app.config import app_config
-from app.cron import uq_scheduler, callback_scheduler
+from app.cron import callback_scheduler, uq_scheduler
 from app.line import webhook
-from app.utils import callback, logger
 from app.models.setup import setup_azure_blob
+from app.utils import callback, logger
 
 app = FastAPI()
 
 # setup logger
 logger.set_global_logger_level()
-logging.debug("TEST")
 
 # setup_database
 setup_azure_blob()

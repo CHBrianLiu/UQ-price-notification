@@ -1,8 +1,9 @@
 import asyncio
 
+from fastapi import APIRouter, Depends
+
 from app.line import data_models, validator
 from app.line.event_handlers import handle_event
-from fastapi import APIRouter, Depends
 
 router = APIRouter()
 
