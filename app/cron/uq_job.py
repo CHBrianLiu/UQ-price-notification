@@ -44,7 +44,7 @@ async def notify():
 
 async def _append_on_sale_product(product_id: str, products: List[str]):
     product = await UqProduct.create(product_id)
-    if await product.is_product_on_sale():
+    if await product.is_product_on_sale:
         products.append(product_id)
 
 

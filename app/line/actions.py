@@ -7,17 +7,18 @@ from app.config import app_config
 from app.line.reply_messages import ResponseMessageType
 from app.models import azure_storage_blob
 from app.models.templates import users
-from app.uq.product import UqProduct
+from app.uq.product import UqProduct, NoUqProduct
 
 
 async def add_tracking_product(user_id: str, product_id: str) -> ResponseMessageType:
-    product = await UqProduct.create(product_id)
-
-    if product.page is None:
+    try:
+        product = await UqProduct.create(product_id)
+    except NoUqProduct:
+        logging.warning("Product ID invalid: %s", product_id)
         return ("not_found", {})
 
     # check if product is on-sale
-    if await product.is_product_on_sale():
+    if await product.is_product_on_sale:
         return ("on_sale", {"title": product.product_name})
 
     # Get user record

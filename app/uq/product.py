@@ -1,10 +1,13 @@
 import logging
+import re
 from typing import List
 
 import aiohttp
-from requests_html import HTML
-from app.requests_html_cxt_mgr.session import AsyncHTMLSessionCxt
+from bs4 import BeautifulSoup
+from bs4.element import Tag
+
 from app.config import app_config
+from app.uq.product_info_model import UqProductData
 
 
 class UqProduct:
@@ -13,20 +16,24 @@ class UqProduct:
     PRODUCT_ICON_LIST_CSS_SELECTOR: str = app_config.UQ_ICON_LIST_CSS
     ON_SALE_ICONS: List[str] = app_config.UQ_ON_SALE_ICON_CSS_LIST
     HIDDEN_ICON_STYLE: str = app_config.UQ_HIDE_ICON_STYLE
+    JSON_DATA_DECLARATION_REGEX: str = "(var\ +JSON_DATA\ +=\ *)(.*)"
 
     product_id: str
     page: str
+    data: UqProductData
+    product_on_sale: bool
 
     @classmethod
-    async def create(cls, product_id):
+    async def create(cls, product_id: str):
         self = UqProduct(product_id)
-        self.page = await self._get_product_page()
+        self.page = await self._download_product_page()
+        self._record_product_data()
         return self
 
     def __init__(self, product_id: str) -> None:
         self.product_id = product_id
 
-    async def _get_product_page(self):
+    async def _download_product_page(self):
         full_url = f"{self.UQ_URL_PREFIX}{self.product_id}"
         async with aiohttp.ClientSession() as session:
             async with session.get(
@@ -47,31 +54,56 @@ class UqProduct:
 
     @property
     def product_name(self):
-        doc = HTML(html=self.page)
-        element = doc.find(self.PRODUCT_NAME_CSS_SELECTOR, first=True)
-        if element is None:
-            logging.error("Can't find product name from the page.")
-            raise RuntimeError("No product name")
-        return element.text
+        return self.data.GoodsInfo.goods.goodsNm
 
-    async def is_product_on_sale(self):
-        async with AsyncHTMLSessionCxt() as session:
-            doc = HTML(session=session, html=self.page)
-            await doc.arender()
-            icon_list = doc.find(self.PRODUCT_ICON_LIST_CSS_SELECTOR, first=True)
-            if icon_list is None:
-                logging.error("Can't find icon list from the page.")
-                raise RuntimeError("No icon list")
-            for icon in self.ON_SALE_ICONS:
-                icon_element = icon_list.find(icon, first=True)
-                if icon_element is None:
-                    logging.warning("Can't find %s icon from the page.")
-                    continue
-                if icon_element.attrs.get("style", "") != self.HIDDEN_ICON_STYLE:
-                    logging.debug(
-                        "%s icon found and not hidden.",
-                        icon_element.attrs.get("title", ""),
-                    )
-                    return True
-            logging.debug("No on-sale icon shown on page.")
-            return False
+    @property
+    def is_product_on_sale(self) -> bool:
+        # Read cache first
+        if hasattr(self, "product_on_sale"):
+            return self.product_on_sale
+        on_sale = False
+        for item_info in self.data.GoodsInfo.goods.l2GoodsList.values():
+            if (
+                item_info.L2GoodsInfo.discountFlg
+                or item_info.L2GoodsInfo.termLimitSalesFlg
+            ):
+                on_sale = True
+        # Cache mechanism
+        self.product_on_sale = on_sale
+        return on_sale
+
+    def _record_product_data(self):
+        if self.page is None:
+            logging.warning("No page content. Cannot process the data retrieval.")
+            raise NoUqProduct
+        raw_json = self._retrieve_product_data_json_string_from_page()
+        if not raw_json:
+            logging.warning("No product data found in the page. Stop processing.")
+            raise NoUqProduct
+        self._parse_product_data_from_raw_json(raw_json)
+
+    def _retrieve_product_data_json_string_from_page(self) -> str:
+        html = BeautifulSoup(self.page, "html.parser")
+        js_statement_tag = html.find(self._is_uq_json_data_tag)
+        if js_statement_tag is None:
+            logging.warning("Cannot find the product data from the HTML.")
+            return ""
+        js_statement = str(js_statement_tag.string)
+        regex_pattern = re.compile(self.JSON_DATA_DECLARATION_REGEX)
+        # Get rid of the ending semicolon
+        return regex_pattern.search(js_statement).group(2)[:-1]
+
+    def _parse_product_data_from_raw_json(self, raw_json: str):
+        self.data = UqProductData.parse_raw(raw_json)
+
+    def _is_uq_json_data_tag(self, tag: Tag) -> bool:
+        regex_pattern = re.compile(self.JSON_DATA_DECLARATION_REGEX)
+        return (
+            tag.name == "script"
+            and tag.string is not None
+            and regex_pattern.search(tag.string) is not None
+        )
+
+
+class NoUqProduct(Exception):
+    pass
