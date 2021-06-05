@@ -14,11 +14,9 @@ app = FastAPI()
 logger.set_global_logger_level()
 
 # start scheduler
-threading.Thread(target=uq_scheduler.scheduler_entry).start()
+threading.Thread(target=uq_scheduler.scheduler).start()
 # To avoid app service going to sleep.
 if app_config.AZURE_APP_SERVICE_CALLBACK_ENABLED:
-    logging.info("Callback mode enabled.")
-    threading.Thread(target=callback_scheduler.scheduler).start()
     app.include_router(callback.router)
 
 app.include_router(webhook.router)

@@ -1,19 +1,12 @@
-import asyncio
 import logging
 import schedule
-import time
 
 from app.cron import callback_job
+from app.config import app_config
 
 
 @schedule.repeat(schedule.every().minutes)
 def do_callback():
-    logging.info("Keep awake.")
-    callback_job.callback()
-
-
-def scheduler():
-    logging.info("Scheduler started.")
-    while True:
-        schedule.run_pending()
-        time.sleep(30)
+    if app_config.AZURE_APP_SERVICE_CALLBACK_ENABLED:
+        logging.info("Keep awake.")
+        callback_job.callback()
