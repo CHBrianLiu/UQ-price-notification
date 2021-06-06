@@ -5,6 +5,7 @@ from app.config import app_config
 from app.line.reply_messages import ResponseMessageType
 from app.models.data_store import data_access
 from app.models.Product import Product
+from app.models.standard_model import DatabaseOperationError
 from app.models.User import User
 from app.uq.product import NoUqProduct, UqProduct
 
@@ -41,6 +42,28 @@ async def add_tracking_product(user_id: str, product_id: str) -> ResponseMessage
     data_access.update_user(user_data)
 
     return ("tracking", {"title": product.product_name})
+
+
+def delete_tracking_product(user_id: str, product_id: str) -> ResponseMessageType:
+    if not data_access.has_user(user_id):
+        logging.warning("No user data existing: %s", user_id)
+        return ("no_user", {})
+    user_data = data_access.get_user_info(user_id)
+    if product_id not in user_data.product_tracking:
+        logging.warning("User tried to delete untracked item.")
+        return ("not_tracking", {})
+    return _delete_tracking_product(user_data, product_id)
+
+
+def _delete_tracking_product(user: User, product_id: str) -> ResponseMessageType:
+    try:
+        user.product_tracking.remove(product_id)
+        user.count_tracking = len(user.product_tracking)
+        data_access.update_user(user)
+        return ("deleted", {})
+    except DatabaseOperationError:
+        logging.exception("Delete item error.")
+    return ("internal_error", {})
 
 
 def list_tracking_products(user_id: str) -> ResponseMessageType:

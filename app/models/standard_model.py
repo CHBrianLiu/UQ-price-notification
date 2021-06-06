@@ -45,3 +45,7 @@ class IDataStore(metaclass=ABCMeta):
     @abstractmethod
     def update_price_down_product_list(self, product_ids: List[str]):
         pass
+
+
+class DatabaseOperationError(Exception):
+    pass
