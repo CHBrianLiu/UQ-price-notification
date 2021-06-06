@@ -32,10 +32,7 @@ class AppConfig(BaseModel):
 
     # UQ
     UQ_PRODUCT_URL_PREFIX: str
-    UQ_PRODUCT_NAME_CSS: str
-    UQ_ICON_LIST_CSS: str
-    UQ_ON_SALE_ICON_CSS_LIST: List[str]
-    UQ_HIDE_ICON_STYLE: str
+    UQ_PRODUCT_URL_REGEX: str
 
     # CRON
     CRON_PRICE_CHECKING: str

@@ -12,10 +12,6 @@ from app.uq.product_info_model import UqProductData
 
 class UqProduct:
     UQ_URL_PREFIX: str = app_config.UQ_PRODUCT_URL_PREFIX
-    PRODUCT_NAME_CSS_SELECTOR: str = app_config.UQ_PRODUCT_NAME_CSS
-    PRODUCT_ICON_LIST_CSS_SELECTOR: str = app_config.UQ_ICON_LIST_CSS
-    ON_SALE_ICONS: List[str] = app_config.UQ_ON_SALE_ICON_CSS_LIST
-    HIDDEN_ICON_STYLE: str = app_config.UQ_HIDE_ICON_STYLE
     JSON_DATA_DECLARATION_REGEX: str = "(var\ +JSON_DATA\ +=\ *)(.*)"
 
     product_id: str
