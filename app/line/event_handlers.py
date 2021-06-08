@@ -32,7 +32,7 @@ async def handle_message_text_event(message_event: data_models.EventType):
 
     if text_content.upper().startswith("LIST") or text_content.startswith("清單"):
         # List all the client's tracked products.
-        response = list_tracking_products(user_id)
+        response = await list_tracking_products(user_id)
         await reply.reply_list_message(message_event, response)
     elif delete_operation_matcher is not None:
         # Delete one tracked product.

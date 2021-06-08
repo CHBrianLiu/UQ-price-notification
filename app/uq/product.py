@@ -68,6 +68,21 @@ class UqProduct:
         self.product_on_sale = on_sale
         return on_sale
 
+    @property
+    def product_image_url(self) -> str:
+        # make sure the same image.
+        color_options = sorted(self.data.GoodsInfo.goods.colorInfoList.keys())
+        return f"{self.data.GoodsInfo.goods.httpsImgDomain}/goods/{self.product_id}/item/{color_options[0]}_{self.product_id}.jpg"
+
+    @property
+    def product_derivatives_lowest_price(self) -> int:
+        prices = [item.L2GoodsInfo.cSalesPrice for item in self.data.GoodsInfo.goods.l2GoodsList.values()]
+        return min(prices)
+
+    @property
+    def product_url(self) -> str:
+        return f"{self.UQ_URL_PREFIX}{self.product_id}"
+
     def _record_product_data(self):
         if self.page is None:
             logging.warning("No page content. Cannot process the data retrieval.")

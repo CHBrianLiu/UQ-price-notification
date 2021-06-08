@@ -2,6 +2,14 @@ import logging
 from typing import List
 
 from app.config import app_config
+from app.line.messages import (
+    CarouselTemplateColumn,
+    CarouselTemplateImageRatio,
+    CarouselTemplateMessage,
+    MessageAction,
+    TemplateMessage,
+    UriAction,
+)
 from app.line.reply_messages import ResponseMessageType
 from app.models.data_store import data_access
 from app.models.Product import Product
@@ -66,7 +74,7 @@ def _delete_tracking_product(user: User, product_id: str) -> ResponseMessageType
     return ("internal_error", {})
 
 
-def list_tracking_products(user_id: str) -> ResponseMessageType:
+async def list_tracking_products(user_id: str) -> ResponseMessageType:
     # Retrieve usre data
     if not data_access.has_user(user_id):
         logging.info("No user %s data.", user_id)
@@ -81,11 +89,41 @@ def list_tracking_products(user_id: str) -> ResponseMessageType:
         return ("no_item", {})
     return (
         "following",
-        {"products": _compose_product_list_message(user_data.product_tracking)},
+        await _compose_product_list_message(user_data.product_tracking),
     )
 
 
-def _compose_product_list_message(products: List[str]):
-    return "\n".join(
-        [f"{app_config.UQ_PRODUCT_URL_PREFIX}{product_id}" for product_id in products]
+async def _compose_product_list_message(product_ids: List[str]):
+    carousel_template = CarouselTemplateMessage(
+        columns=[
+            _create_uq_product_carousel_template_column(
+                await UqProduct.create(product_id)
+            )
+            for product_id in product_ids
+        ],
+        imageAspectRatio=CarouselTemplateImageRatio.square,
+    )
+    alt_text = "\n".join(
+        [
+            f"{app_config.UQ_PRODUCT_URL_PREFIX}{product_id}"
+            for product_id in product_ids
+        ]
+    )
+    return TemplateMessage(altText=alt_text, template=carousel_template).dict(
+        exclude_none=True
+    )
+
+
+def _create_uq_product_carousel_template_column(
+    product: UqProduct,
+) -> CarouselTemplateColumn:
+    item_link_action_button = UriAction(uri=product.product_url, label="前往商品頁面")
+    delete_item_action_button = MessageAction(
+        text=f"delete {product.product_id}", label="取消追蹤商品"
+    )
+    return CarouselTemplateColumn(
+        title=product.product_name,
+        text=f"{app_config.UQ_PRODUCT_CURRENCY}{product.product_derivatives_lowest_price}",
+        thumbnailImageUrl=product.product_image_url,
+        actions=[item_link_action_button, delete_item_action_button],
     )

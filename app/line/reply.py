@@ -6,6 +6,7 @@ import aiohttp
 
 from app.config import app_config
 from app.line import data_models
+from app.line.messages import TextMessage
 from app.line.reply_messages import (
     ResponseMessageType,
     add_messages,
@@ -46,8 +47,13 @@ async def reply(
 async def reply_list_message(
     event: data_models.EventType, response: ResponseMessageType
 ):
-    message = list_messages.messages[response[0]].format(**(response[1]))
-    await reply(event.get("replyToken", ""), [{"type": "text", "text": message}])
+    if response[0] in list_messages.messages.keys():
+        message = TextMessage(
+            text=list_messages.messages[response[0]].format(**(response[1]))
+        )
+    else:
+        message = response[1]
+    await reply(event.get("replyToken", ""), [message])
 
 
 async def reply_delete_message(

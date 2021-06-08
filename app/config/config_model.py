@@ -37,6 +37,7 @@ class AppConfig(BaseModel):
     # UQ
     UQ_PRODUCT_URL_PREFIX: str
     UQ_PRODUCT_URL_REGEX: str
+    UQ_PRODUCT_CURRENCY: str
 
     # CRON
     CRON_PRICE_CHECKING: str
