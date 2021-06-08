@@ -28,7 +28,7 @@ async def handle_message_text_event(message_event: data_models.EventType):
     user_id = message_event.get("source", {}).get("userId", "anonymous")
 
     uq_url_matcher = re.match(app_config.UQ_PRODUCT_URL_REGEX, text_content)
-    delete_operation_matcher = re.match(app_config.DELETE_REGEX_PATTERN, text_content)
+    delete_operation_matcher = re.match(app_config.DELETE_REGEX_PATTERN, text_content, re.IGNORECASE)
 
     if text_content.upper().startswith("LIST") or text_content.startswith("清單"):
         # List all the client's tracked products.
