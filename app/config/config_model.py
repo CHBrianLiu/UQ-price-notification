@@ -9,8 +9,12 @@ class DatabaseTypeEnum(str, Enum):
 
 
 class AppConfig(BaseModel):
+    # APP
+    TRACKING_ITEM_MAXIMUM: int
+
     # Debug mode
     LOCAL_TESTING: bool
+
     # LINE ENDPOINTS
     LINE_REPLY_ENDPOINT: str
     LINE_PUSH_ENDPOINT: str

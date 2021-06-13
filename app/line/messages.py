@@ -21,10 +21,6 @@ class TextMessage(MessageBase):
     emojis: Optional[List[EmojiInTextMessage]]
 
 
-class ConfirmTemplateMessage(MessageBase):
-    actions: List[Dict[str, str]]
-
-
 class MessageAction(BaseModel):
     type: str = Field("message", const=True)
     label: Optional[str] = Field(max_length=20)
@@ -68,6 +64,12 @@ class ButtonTemplateMessage(BaseModel):
     imageBackgroundColor: Optional[str]
 
 
+class ConfirmTemplateMessage(BaseModel):
+    type: str = Field("confirm", const=True)
+    text: str = Field(max_length=240)
+    actions: List[Union[MessageAction, UriAction]] = Field(min_items=2, max_items=2)
+
+
 class CarouselTemplateMessage(BaseModel):
     type: str = Field("carousel", const=True)
     columns: List[CarouselTemplateColumn] = Field(max_items=10)
@@ -78,4 +80,6 @@ class CarouselTemplateMessage(BaseModel):
 class TemplateMessage(BaseModel):
     type: str = Field("template", const=False)
     altText: str = Field(max_length=400)
-    template: Union[CarouselTemplateMessage, ButtonTemplateMessage]
+    template: Union[
+        CarouselTemplateMessage, ButtonTemplateMessage, ConfirmTemplateMessage
+    ]

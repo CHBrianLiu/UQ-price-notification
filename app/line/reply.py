@@ -67,8 +67,13 @@ async def reply_delete_message(
 async def reply_add_message(
     event: data_models.EventType, response: ResponseMessageType
 ):
-    message = add_messages.messages[response[0]].format(**(response[1]))
-    await reply(event.get("replyToken", ""), [{"type": "text", "text": message}])
+    if response[0] in add_messages.messages.keys():
+        message = TextMessage(
+            text=add_messages.messages[response[0]].format(**(response[1]))
+        ).dict(exclude_none=True)
+    else:
+        message = response[1]
+    await reply(event.get("replyToken", ""), [message])
 
 
 async def reply_confirm_adding_message(

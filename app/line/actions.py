@@ -7,6 +7,7 @@ from app.line.messages import (
     CarouselTemplateColumn,
     CarouselTemplateImageRatio,
     CarouselTemplateMessage,
+    ConfirmTemplateMessage,
     MessageAction,
     TemplateMessage,
     UriAction,
@@ -36,6 +37,10 @@ async def add_tracking_product(user_id: str, product_id: str) -> ResponseMessage
     # Product has been tracked
     if product_id in user_data.product_tracking:
         return ("in_list", {"title": product.product_name})
+
+    if user_data.count_tracking >= app_config.TRACKING_ITEM_MAXIMUM:
+        return ("reach_limit", _create_confirm_template_for_reaching_limit())
+
     user_data.product_tracking.add(product_id)
     user_data.count_tracking += 1
 
@@ -47,6 +52,18 @@ async def add_tracking_product(user_id: str, product_id: str) -> ResponseMessage
     data_access.update_user(user_data)
 
     return ("tracking", {"title": product.product_name})
+
+
+def _create_confirm_template_for_reaching_limit():
+    manage_list_action = MessageAction(text="list", label="我的追蹤清單")
+    cancel_action = MessageAction(text="cancel", label="我知道了！")
+    confirm_template = ConfirmTemplateMessage(
+        text="你的追蹤清單已滿！\n來整理一下你的清單吧！", actions=[manage_list_action, cancel_action]
+    )
+    return TemplateMessage(
+        altText="You've reached the limit of number of tracking items.",
+        template=confirm_template,
+    ).dict(exclude_none=True)
 
 
 async def confirm_product_adding(product_id: str) -> ResponseMessageType:
