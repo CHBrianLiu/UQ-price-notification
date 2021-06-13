@@ -1,10 +1,13 @@
 import json
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 import aiohttp
+
 from app.config import app_config
+from app.line.messages import TextMessage
 from app.line.push_messages import price_down_messages
+from app.line.utils import compose_product_carousel
 
 
 async def push(
@@ -35,8 +38,13 @@ async def push(
                 )
 
 
-async def push_price_down_message(
-    user_id: str, response: Tuple[str, Dict[str, Any]]
-):
-    message = price_down_messages.messages[response[0]].format(**(response[1]))
-    await push(user_id, [{"type": "text", "text": message}])
+async def push_price_down_message(user_id: str, product_ids: List[str]):
+    headline = TextMessage(text=price_down_messages.messages.get("headline"))
+    products = await compose_product_carousel(product_ids)
+    await push(
+        user_id,
+        [
+            headline.dict(exclude_none=True),
+            products.dict(exclude_none=True),
+        ],
+    )

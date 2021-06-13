@@ -48,20 +48,4 @@ async def _notify_one_user(user_id: str, target_products: List[str]):
     if not products_to_notify:
         logging.info("For user %s, no tracked product on-sale", user_id)
         return
-    await push_price_down_message(
-        user_id,
-        (
-            "price_down",
-            {
-                "links": "\n".join(
-                    [
-                        f"{app_config.UQ_PRODUCT_URL_PREFIX}{product_id}"
-                        for product_id in products_to_notify
-                    ]
-                )
-            },
-        ),
-    )
-    user_data.product_tracking = user_tracking_list - products_to_notify
-    user_data.count_tracking = len(user_data.product_tracking)
-    data_access.update_user(user_data)
+    await push_price_down_message(user_id, list(products_to_notify))

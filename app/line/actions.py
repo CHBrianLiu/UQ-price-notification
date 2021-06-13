@@ -13,6 +13,7 @@ from app.line.messages import (
     UriAction,
 )
 from app.line.reply_messages import ResponseMessageType
+from app.line.utils import compose_product_carousel
 from app.models.data_store import data_access
 from app.models.Product import Product
 from app.models.standard_model import DatabaseOperationError
@@ -132,41 +133,7 @@ async def list_tracking_products(user_id: str) -> ResponseMessageType:
         return ("no_item", {})
     return (
         "following",
-        await _compose_product_list_message(user_data.product_tracking),
-    )
-
-
-async def _compose_product_list_message(product_ids: List[str]):
-    carousel_template = CarouselTemplateMessage(
-        columns=[
-            _create_uq_product_carousel_template_column(
-                await UqProduct.create(product_id)
-            )
-            for product_id in product_ids
-        ],
-        imageAspectRatio=CarouselTemplateImageRatio.square,
-    )
-    alt_text = "\n".join(
-        [
-            f"{app_config.UQ_PRODUCT_URL_PREFIX}{product_id}"
-            for product_id in product_ids
-        ]
-    )
-    return TemplateMessage(altText=alt_text, template=carousel_template).dict(
-        exclude_none=True
-    )
-
-
-def _create_uq_product_carousel_template_column(
-    product: UqProduct,
-) -> CarouselTemplateColumn:
-    item_link_action_button = UriAction(uri=product.product_url, label="前往商品頁面")
-    delete_item_action_button = MessageAction(
-        text=f"delete {product.product_id}", label="取消追蹤商品"
-    )
-    return CarouselTemplateColumn(
-        title=product.product_name,
-        text=f"{app_config.UQ_PRODUCT_CURRENCY}{product.product_derivatives_lowest_price}",
-        thumbnailImageUrl=product.product_image_url,
-        actions=[item_link_action_button, delete_item_action_button],
+        (await compose_product_carousel(user_data.product_tracking)).dict(
+            exclude_none=True
+        ),
     )
