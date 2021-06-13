@@ -1,8 +1,9 @@
 import logging
-from typing import List
+from typing import Any, Dict, List
 
 from app.config import app_config
 from app.line.messages import (
+    ButtonTemplateMessage,
     CarouselTemplateColumn,
     CarouselTemplateImageRatio,
     CarouselTemplateMessage,
@@ -25,10 +26,6 @@ async def add_tracking_product(user_id: str, product_id: str) -> ResponseMessage
         logging.warning("Product ID invalid: %s", product_id)
         return ("not_found", {})
 
-    # check if product is on-sale
-    if product.is_product_on_sale:
-        return ("on_sale", {"title": product.product_name})
-
     # Mew user, copy from template
     user_data = (
         data_access.get_user_info(user_id)
@@ -50,6 +47,35 @@ async def add_tracking_product(user_id: str, product_id: str) -> ResponseMessage
     data_access.update_user(user_data)
 
     return ("tracking", {"title": product.product_name})
+
+
+async def confirm_product_adding(product_id: str) -> ResponseMessageType:
+    try:
+        product = await UqProduct.create(product_id)
+    except NoUqProduct:
+        logging.warning("Product ID invalid: %s", product_id)
+        return ("not_found", {})
+
+    button_template = _create_button_template(product)
+    alt_text = f"To add {product.product_name} to your tracking list, type:\nadd {product.product_id}"
+
+    return (
+        "confirm",
+        TemplateMessage(altText=alt_text, template=button_template).dict(
+            exclude_none=True
+        ),
+    )
+
+
+def _create_button_template(product: UqProduct) -> Dict[str, Any]:
+    add_action_button = MessageAction(text=f"add {product.product_id}", label="Yes")
+    cancel_action_button = MessageAction(text="cancel", label="No")
+    return ButtonTemplateMessage(
+        title=product.product_name,
+        text=f"{app_config.UQ_PRODUCT_CURRENCY}{product.product_derivatives_lowest_price}\n你要追蹤此商品嗎？",
+        thumbnailImageUrl=product.product_image_url,
+        actions=[add_action_button, cancel_action_button],
+    )
 
 
 def delete_tracking_product(user_id: str, product_id: str) -> ResponseMessageType:

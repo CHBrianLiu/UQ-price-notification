@@ -56,6 +56,18 @@ class CarouselTemplateImageSize(str, Enum):
     contain = "contain"
 
 
+class ButtonTemplateMessage(BaseModel):
+    type: str = Field("buttons", const=True)
+    title: Optional[str] = Field(max_length=40)
+    text: str = Field(max_length=160)
+    actions: List[Union[MessageAction, UriAction]] = Field(max_items=4)
+    defaultAction: Optional[Union[MessageAction, UriAction]]
+    thumbnailImageUrl: Optional[str] = Field(max_length=1000)
+    imageAspectRatio: CarouselTemplateImageRatio = CarouselTemplateImageRatio.rectangle
+    imageSize: CarouselTemplateImageSize = CarouselTemplateImageSize.cover
+    imageBackgroundColor: Optional[str]
+
+
 class CarouselTemplateMessage(BaseModel):
     type: str = Field("carousel", const=True)
     columns: List[CarouselTemplateColumn] = Field(max_items=10)
@@ -66,4 +78,4 @@ class CarouselTemplateMessage(BaseModel):
 class TemplateMessage(BaseModel):
     type: str = Field("template", const=False)
     altText: str = Field(max_length=400)
-    template: Union[CarouselTemplateMessage]
+    template: Union[CarouselTemplateMessage, ButtonTemplateMessage]

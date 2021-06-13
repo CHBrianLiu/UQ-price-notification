@@ -13,6 +13,7 @@ from app.line.reply_messages import (
     delete_messages,
     help_messages,
     list_messages,
+    confirm_add_messages,
 )
 
 
@@ -50,7 +51,7 @@ async def reply_list_message(
     if response[0] in list_messages.messages.keys():
         message = TextMessage(
             text=list_messages.messages[response[0]].format(**(response[1]))
-        )
+        ).dict(exclude_none=True)
     else:
         message = response[1]
     await reply(event.get("replyToken", ""), [message])
@@ -70,8 +71,25 @@ async def reply_add_message(
     await reply(event.get("replyToken", ""), [{"type": "text", "text": message}])
 
 
-async def reply_help_message(event: data_models.EventType):
+async def reply_confirm_adding_message(
+    event: data_models.EventType, response: ResponseMessageType
+):
+    if response[0] in confirm_add_messages.messages.keys():
+        message = TextMessage(
+            text=confirm_add_messages.messages[response[0]].format(**(response[1]))
+        ).dict(exclude_none=True)
+    else:
+        message = response[1]
+    await reply(event.get("replyToken", ""), [message])
+
+
+async def reply_help_message(event: data_models.EventType, keyword: str):
+    text = (
+        help_messages.messages.get(keyword)
+        if keyword in help_messages.messages
+        else help_messages.messages["help"]
+    )
     await reply(
         event.get("replyToken", ""),
-        [{"type": "text", "text": help_messages.messages["help"]}],
+        [{"type": "text", "text": text}],
     )
