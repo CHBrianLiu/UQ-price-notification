@@ -1,0 +1,51 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - uq-notifier-staging
+
+on:
+  push:
+    branches:
+      - beta
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Log in to registry
+      uses: docker/login-action@v1
+      with:
+        registry: https://index.docker.io/v1/
+        username: ${{ secrets.AzureAppService_ContainerUsername_72a43e01590946b08f22c3938a332f09 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_3ad0d366ef9a4c8394718199673322d8 }}
+
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_72a43e01590946b08f22c3938a332f09 }}/uq_notifier:${{ github.sha }}
+        file: ./Dockerfile
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'integration'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'uq-notifier-staging'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_76d9599c3c994d92b61a1bc86508e6a4 }}
+        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_72a43e01590946b08f22c3938a332f09 }}/uq_notifier:${{ github.sha }}'

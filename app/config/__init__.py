@@ -22,10 +22,5 @@ loaded_config = {
     **os.environ,
 }
 
-# manual conversion
-loaded_config["UQ_ON_SALE_ICON_CSS_LIST"] = json.loads(
-    loaded_config["UQ_ON_SALE_ICON_CSS_LIST"]
-)
-
 # USE THIS AS CONFIG OBJECT
 app_config = AppConfig(**loaded_config)

@@ -12,10 +12,6 @@ from app.uq.product_info_model import UqProductData
 
 class UqProduct:
     UQ_URL_PREFIX: str = app_config.UQ_PRODUCT_URL_PREFIX
-    PRODUCT_NAME_CSS_SELECTOR: str = app_config.UQ_PRODUCT_NAME_CSS
-    PRODUCT_ICON_LIST_CSS_SELECTOR: str = app_config.UQ_ICON_LIST_CSS
-    ON_SALE_ICONS: List[str] = app_config.UQ_ON_SALE_ICON_CSS_LIST
-    HIDDEN_ICON_STYLE: str = app_config.UQ_HIDE_ICON_STYLE
     JSON_DATA_DECLARATION_REGEX: str = "(var\ +JSON_DATA\ +=\ *)(.*)"
 
     product_id: str
@@ -71,6 +67,21 @@ class UqProduct:
         # Cache mechanism
         self.product_on_sale = on_sale
         return on_sale
+
+    @property
+    def product_image_url(self) -> str:
+        # make sure the same image.
+        color_options = sorted(self.data.GoodsInfo.goods.colorInfoList.keys())
+        return f"{self.data.GoodsInfo.goods.httpsImgDomain}/goods/{self.product_id}/item/{color_options[0]}_{self.product_id}.jpg"
+
+    @property
+    def product_derivatives_lowest_price(self) -> int:
+        prices = [item.L2GoodsInfo.cSalesPrice for item in self.data.GoodsInfo.goods.l2GoodsList.values()]
+        return min(prices)
+
+    @property
+    def product_url(self) -> str:
+        return f"{self.UQ_URL_PREFIX}{self.product_id}"
 
     def _record_product_data(self):
         if self.page is None:
