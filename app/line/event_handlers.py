@@ -28,6 +28,9 @@ async def handle_message_text_event(message_event: data_models.EventType):
     text_content = message_info.get("text", "")
     user_id = message_event.get("source", {}).get("userId", "anonymous")
 
+    list_operation_matcher = re.match(
+        app_config.LIST_REGEX_PATTERN, text_content, re.IGNORECASE
+    )
     uq_url_matcher = re.match(app_config.UQ_PRODUCT_URL_REGEX, text_content)
     confirm_operation_matcher = re.match(
         app_config.CONFIRM_ADDING_REGEX_PATTERN, text_content, re.IGNORECASE
@@ -36,7 +39,7 @@ async def handle_message_text_event(message_event: data_models.EventType):
         app_config.DELETE_REGEX_PATTERN, text_content, re.IGNORECASE
     )
 
-    if text_content.upper().startswith("LIST") or text_content.startswith("清單"):
+    if list_operation_matcher is not None:
         # List all the client's tracked products.
         response = await list_tracking_products(user_id)
         await reply.reply_list_message(message_event, response)
