@@ -86,8 +86,8 @@ async def confirm_product_adding(product_id: str) -> ResponseMessageType:
 
 
 def _create_button_template(product: UqProduct) -> Dict[str, Any]:
-    add_action_button = MessageAction(text=f"add {product.product_id}", label="Yes")
-    cancel_action_button = MessageAction(text="cancel", label="No")
+    add_action_button = MessageAction(text=f"新增 {product.product_id}", label="Yes")
+    cancel_action_button = MessageAction(text="取消", label="No")
     return ButtonTemplateMessage(
         title=product.product_name,
         text=f"{app_config.UQ_PRODUCT_CURRENCY}{product.product_derivatives_lowest_price}\n你要追蹤此商品嗎？",

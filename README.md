@@ -1,55 +1,39 @@
-# UQ-price-notification
+# UQ Price Down Notification Bot
 
 Save the money!
 
-> This service currently supports Taiwan UQ website only. If you would like to contribute to it, feel free to open an issue.
+> This service currently supports Taiwan UQ website only. If you would like to contribute to it, feel free to open clone the repo.
 
 ## Use cases
 
-Users can use the LINE chatbot directly by entering commands just after they adding the bot as a friend.
-Currently the service provides following functionalities.
+Users can use the LINE chatbot directly by entering commands or tapping the interactive pannels just after they adding the bot as a friend.
 
-1. Follow a UQ product. If the product has discount in the future, the bot will notify the users who subscribe to the product.
-1. Unfollow a product.
-1. List following products.
+### Interaction
 
-![usecase](./pics/usecase.jpg)
+1. Add one UQ item to the tracking list.
+2. Manage the personal tracking list.
 
-## Development
+![demo-manage](pics/showcase_manage.jpg)
 
-### Requirements
+### Notification
 
-1. Docker Desktop
-1. Python 3.8
-1. [LINE Official Account](https://account.line.biz/)
-1. Azure blob storage service  
-   We plan to support SQL service in future phase.
+1. When the items tracked by the user is on-sale, the user will get a notification.
+
+
+
+## Host the service
 
 ### Prerequisites
 
-To run this app locally, you'll need to finish some stuff.
+To host the service, you'll need to prepare the information listed below.
 
-1. Use a [LINE simulator](https://github.com/kenakamu/LINESimulator) developed by kenakamu san.
-
-    1. Clone the repository.
-    1. Build the Docker image.
-
-        ```bash
-        docker image build --tag=linesimulator .
-        ```
-
-    1. Run the container on port `8080`.
-
-        ```bash
-        docker container run -d --rm -p 8080:8080 linesimulator
-        ```
-
-2. Retrieve LINE Official Account information from [LINE Developers](https://developers.line.biz/).
+1. Retrieve LINE Official Account information from [LINE Developers](https://developers.line.biz/).
     1. Channel secret
     1. Channel token
     1. User ID
+2. Azure Storage Account for blob storage.
 
-### Run the service
+### Run the application
 
 1. Build the image.
 
@@ -72,13 +56,14 @@ To run this app locally, you'll need to finish some stuff.
         --name=uq_bot uq_notifier:latest
     ```
 
-### Test by LINE simulator
+## Development
 
-Once the LINE simulator and LINE bot service are running, you can test the service by using browser to visit [http://localhost:8080/](http://localhost:8080/). Fill the field with your LINE bot info, the **Bot API Server Address** is `http://host.docker.internal/line/webhook`.
+Check out the [docs](docs/development.md).
 
-![bot config](pics/bot_config.jpg)
-## Deployment
+## Contribution
 
-To deploy FAST API app to Azure Web App, configure the service with the following settings
+The visual elements and the arts are designed by [Pearl Chen](mailto:pearlchen317@gmail.com).
 
--   Startup command: `gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app`
+## Disclaimer
+
+This project doesn't lead to any profitability.

@@ -36,7 +36,7 @@ def create_uq_product_carousel_template_column(
 ) -> CarouselTemplateColumn:
     item_link_action_button = UriAction(uri=product.product_url, label="前往商品頁面")
     delete_item_action_button = MessageAction(
-        text=f"delete {product.product_id}", label="取消追蹤商品"
+        text=f"刪除 {product.product_id}", label="取消追蹤商品"
     )
     return CarouselTemplateColumn(
         title=product.product_name,
