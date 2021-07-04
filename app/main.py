@@ -1,18 +1,21 @@
-import logging
 import threading
 
 from fastapi import FastAPI
 
 from app.config import app_config
-from app.cron import callback_scheduler, uq_scheduler
+from app.cron import uq_scheduler
 from app.line import webhook
 from app.line.rich_menu import prepare_rich_menu
+from app.models.data_store import data_access
 from app.utils import callback, logger
 
 app = FastAPI()
 
 # setup logger
 logger.set_global_logger_level()
+
+# Setup database connection
+data_access.setup()
 
 # Setup LINE rich menu
 prepare_rich_menu.setup()
