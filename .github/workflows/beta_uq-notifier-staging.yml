@@ -10,8 +10,37 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install nose
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Unit testing with nose
+        env:
+          LINE_LINE_BOT_USER_ID: "FAKE_ID"
+          LINE_LINE_BOT_CHANNEL_SECRET: "FAKE_SECRET"
+          LINE_LINE_BOT_CHANNEL_TOKEN: "FAKE_TOKEN"
+          AZURE_ACCOUNT_NAME: "FAKE_ACCOUNT"
+          AZURE_ACCOUNT_KEY: "FAKE_KEY"
+          AZURE_WEB_APP_CALLBACK_URL: "http://localhost/callback"
+        run: |
+          python -m nose
+
   build:
     runs-on: 'ubuntu-latest'
+    needs: test
 
     steps:
     - uses: actions/checkout@v2

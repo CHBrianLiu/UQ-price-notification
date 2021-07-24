@@ -33,7 +33,7 @@ class AzureBlob(IDataStore):
 
     price_down_product_list: str = "price-down.json"
 
-    def __init__(self) -> None:
+    def setup(self):
         self._credential_setup()
         self._setup_azure_blob()
         self._container_factory_setup()

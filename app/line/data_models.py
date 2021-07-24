@@ -1,10 +1,11 @@
+from enum import Enum
 from typing import Dict, List, Optional, Union
-from typing_extensions import TypedDict
 
 from pydantic import BaseModel
+from pydantic.fields import Field
 
 
-class SourceBase(TypedDict):
+class SourceBase(BaseModel):
     type: str
 
 
@@ -20,12 +21,28 @@ class RoomSource(UserSource):
     roomId: str
 
 
+class EventMode(str, Enum):
+    active = "active"
+    standby = "standby"
+
+
 # Can't use TypedDict because it doesn't take extra keys. Make this as reference.
-class WebhookEvent(TypedDict):
+class WebhookEventBase(BaseModel):
     type: str
-    mode: str
+    mode: EventMode
     timestamp: int
     source: Union[UserSource, GroupSource, RoomSource]
+
+
+class PostbackEventPostback(BaseModel):
+    data: str
+    params: Optional[Dict[str, str]]
+
+
+class PostbackEvent(WebhookEventBase):
+    replyToken: str
+    type: str = Field("postback", const=True)
+    postback: PostbackEventPostback
 
 
 class LineRequest(BaseModel):

@@ -76,7 +76,7 @@ async def reply_add_message(
     await reply(event.get("replyToken", ""), [message])
 
 
-async def reply_confirm_adding_message(
+async def reply_adding_confirmation_message(
     event: data_models.EventType, response: ResponseMessageType
 ):
     if response[0] in confirm_add_messages.messages.keys():

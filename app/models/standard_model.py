@@ -7,6 +7,10 @@ from app.models.User import User
 
 class IDataStore(metaclass=ABCMeta):
     @abstractmethod
+    def setup(self):
+        pass
+
+    @abstractmethod
     def has_user(self, user_id: str) -> bool:
         pass
 

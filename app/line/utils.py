@@ -5,10 +5,11 @@ from app.line.messages import (
     CarouselTemplateColumn,
     CarouselTemplateImageRatio,
     CarouselTemplateMessage,
-    MessageAction,
+    PostbackAction,
     TemplateMessage,
     UriAction,
 )
+from app.line.postback_data import PostbackDataDeleting
 from app.uq.product import UqProduct
 
 
@@ -34,9 +35,11 @@ async def compose_product_carousel(product_ids: List[str]) -> TemplateMessage:
 def create_uq_product_carousel_template_column(
     product: UqProduct,
 ) -> CarouselTemplateColumn:
-    item_link_action_button = UriAction(uri=product.product_url, label="前往商品頁面")
-    delete_item_action_button = MessageAction(
-        text=f"刪除 {product.product_id}", label="取消追蹤商品"
+    item_link_action_button = UriAction(uri=product.product_url, label="前往官網")
+    delete_item_action_button = PostbackAction(
+        displayText="取消追蹤",
+        label="取消追蹤",
+        data=PostbackDataDeleting(product_id=product.product_id).json(),
     )
     return CarouselTemplateColumn(
         title=product.product_name,
