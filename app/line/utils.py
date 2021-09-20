@@ -10,17 +10,24 @@ from app.line.messages import (
     UriAction,
 )
 from app.line.postback_data import PostbackDataDeleting
-from app.uq.product import UqProduct
+from app.uq.product import NoUqProduct, UqProduct
 
 
 async def compose_product_carousel(product_ids: List[str]) -> TemplateMessage:
-    carousel_template = CarouselTemplateMessage(
-        columns=[
-            create_uq_product_carousel_template_column(
-                await UqProduct.create(product_id)
+    columns = []
+    for product_id in product_ids:
+        try:
+            columns.append(
+                create_uq_product_carousel_template_column(
+                    await UqProduct.create(product_id)
+                )
             )
-            for product_id in product_ids
-        ],
+        except NoUqProduct:
+            columns.append(
+                create_unknown_uq_product_carousel_template_column(product_id)
+            )
+    carousel_template = CarouselTemplateMessage(
+        columns=columns,
         imageAspectRatio=CarouselTemplateImageRatio.square,
     )
     alt_text = "\n".join(
@@ -46,4 +53,17 @@ def create_uq_product_carousel_template_column(
         text=f"{app_config.UQ_PRODUCT_CURRENCY}{product.product_derivatives_lowest_price}",
         thumbnailImageUrl=product.product_image_url,
         actions=[item_link_action_button, delete_item_action_button],
+    )
+
+
+def create_unknown_uq_product_carousel_template_column(product_id: str):
+    delete_item_action_button = PostbackAction(
+        displayText="取消追蹤",
+        label="取消追蹤",
+        data=PostbackDataDeleting(product_id=product_id).json(),
+    )
+    return CarouselTemplateColumn(
+        title=f"不存在的商品 ({product_id})",
+        text="找不到這項商品，可能已經被下架了。",
+        actions=[delete_item_action_button],
     )
