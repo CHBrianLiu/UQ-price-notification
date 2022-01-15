@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:14.1
+    restart: always
+    environment:
+      # local dev only
+      POSTGRES_PASSWORD: password
+
+  line-simulator:
+    build:
+      context: https://github.com/kenakamu/LINESimulator.git
+    restart: always
+    ports:
+      - "8081:8080"
+
+  uq-dev:
+    build:
+      context: ./
+      dockerfile: dev.dockerfile
+    volumes:
+      - ".:/usr/src/app"
+    tty: true
