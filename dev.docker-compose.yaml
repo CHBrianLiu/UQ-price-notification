@@ -3,9 +3,14 @@ services:
   db:
     image: postgres:14.1
     restart: always
+    ports:
+      - "5432:5432"
     environment:
       # local dev only
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: uq
+    volumes:
+      - uq_data:/var/lib/postgrsql/data
 
   line-simulator:
     build:
@@ -21,3 +26,6 @@ services:
     volumes:
       - ".:/usr/src/app"
     tty: true
+
+volumes:
+  uq_data:
