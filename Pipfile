@@ -8,6 +8,7 @@ fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
 psycopg2 = "*"
+line-bot-sdk = "*"
 
 [dev-packages]
 bpython = "*"
