@@ -1,0 +1,24 @@
+name: "Linting on PR"
+on: [pull_request]
+jobs:
+  pylint-check:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.10.2'
+      - run: pip install pylint
+      - run: pylint src
+        env:
+          PYTHONPATH: ${{ env.GITHUB_WORKSPACE }}
+
+  black-check:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.10.2'
+      - run: pip install black
+      - run: black --check src
