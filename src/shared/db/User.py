@@ -9,8 +9,12 @@ class User(db.Base):
     __tablename__ = "users"
 
     id = sqlalchemy.Column(sqlalchemy.String(100), primary_key=True)
-    role_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("roles.id"), nullable=False)
+    role_id = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey("roles.id"), nullable=False
+    )
     created = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False)
 
     role = orm.relationship("Role")
-    products = orm.relationship("Product", secondary=UsersProducts.users_products, backref="users")
+    products = orm.relationship(
+        "Product", secondary=UsersProducts.users_products, backref="users"
+    )
