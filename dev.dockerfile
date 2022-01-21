@@ -10,4 +10,4 @@ COPY Pipfile.lock /usr/src/app/Pipfile.lock
 
 RUN pipenv install --system --dev
 
-ENTRYPOINT ["bash"]
+CMD "bash"
