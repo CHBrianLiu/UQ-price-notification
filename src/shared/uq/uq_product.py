@@ -21,7 +21,7 @@ class UqRetriever:
         path = f"/tw/p/product/i/product/spu/pc/query/{self.product_code}/zh_TW"
         return f"https://{domain}{path}"
 
-    def _get_data_impl(self, url) -> dict:
+    def _get_data_from_url(self, url) -> dict:
         headers = {
             "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) \
             AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
@@ -60,30 +60,42 @@ class UqProduct:
     def name(self) -> str:
         if not self._product_data:
             self._product_data = self.retriever.get_product_info()
-        return self._product_data["fullName"]
+        try:
+            return self._product_data["fullName"]
+        except KeyError as e:
+            raise UqProductException() from e
 
     @property
     def is_on_sale(self) -> bool:
         if not self._product_data:
             self._product_data = self.retriever.get_product_info()
-        return (
-            self._product_data["priceColor"] == "red"
-            and self.special_offer < self.original_price
-        )
+        try:
+            return (
+                self._product_data["priceColor"] == "red"
+                and self.special_offer < self.original_price
+            )
+        except KeyError as e:
+            raise UqProductException() from e
 
     @property
-    def original_price(self) -> float:
+    def original_price(self) -> int:
         if not self._product_data:
             self._product_data = self.retriever.get_product_info()
-        return float(self._product_data["originPrice"])
+        try:
+            return int(self._product_data["originPrice"])
+        except KeyError as e:
+            raise UqProductException() from e
 
     @property
-    def special_offer(self) -> float:
+    def special_offer(self) -> int:
         if not self._price_data:
             self._price_data = self.retriever.get_price_info()
-        min_price: float = self._price_data["summary"]["minPrice"]
-        max_price: float = self._price_data["summary"]["maxPrice"]
-        if min_price != max_price:
-            # handle the min price and max price are different
-            pass
-        return float(min_price)
+        try:
+            min_price: int = self._price_data["summary"]["minPrice"]
+            max_price: int = self._price_data["summary"]["maxPrice"]
+            if min_price != max_price:
+                # handle the min price and max price are different
+                pass
+            return int(min_price)
+        except KeyError as e:
+            raise UqProductException() from e
