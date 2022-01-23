@@ -10,4 +10,4 @@ jobs:
           python-version: '3.10.2'
       - run: pip install pipenv
       - run: pipenv install --system --dev
-      - run: python -m unittest tests
+      - run: python -m unittest discover tests
