@@ -5,7 +5,7 @@ import hmac
 import fastapi
 from fastapi import exceptions
 
-import config
+from src import config
 
 
 def line_webhook_request_signature_validator(
