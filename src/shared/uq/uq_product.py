@@ -6,7 +6,17 @@ class UqProductException(Exception):
 
 
 class UqRetriever:
-    def __init__(self, product_code: str) -> None:
+    """
+    The class to get the UQ product information from the website.
+    """
+
+    # The user-agent header matters when issue an API request to the server
+    _custom_headers = {
+        "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) \
+                AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
+    }
+
+    def __init__(self, product_code: str, session: requests.Session) -> None:
         self.product_code = product_code
         self._session = session
 
@@ -23,10 +33,6 @@ class UqRetriever:
         return f"https://{domain}{path}"
 
     def _get_data_from_url(self, url) -> dict:
-        headers = {
-            "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) \
-            AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
-        }
         try:
             resp = self._session.get(url, headers=self._custom_headers)
             if not resp.ok:
@@ -36,15 +42,27 @@ class UqRetriever:
             raise UqProductException() from e
 
     def get_product_info(self) -> dict:
+        """
+        Get the UQ product information from the website, including name, description and so on.
+
+        Returns: A dictionary containing the production information. Sample data can be found in
+                 tests/ut/shared/uq/test_uq_product.py.
+        """
         try:
-            data = self._get_data_impl(self._product_info_url)
+            data = self._get_data_from_url(self._product_info_url)
             return data["summary"]
         except KeyError as e:
             raise UqProductException() from e
 
     def get_price_info(self) -> dict:
+        """
+        Get the UQ product price information from the website.
+
+        Returns: A dictionary containing the production information. Sample data can be found in
+                 tests/ut/shared/uq/test_uq_product.py.
+        """
         try:
-            data = self._get_data_impl(self._price_info_url)
+            data = self._get_data_from_url(self._price_info_url)
             return data["resp"][0]
         except KeyError as e:
             raise UqProductException() from e
