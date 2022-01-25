@@ -2,7 +2,7 @@ import unittest
 from src.shared.uq.uq_product import UqProduct
 
 
-class MockUqRetriver:
+class MockUqRetriever:
     def get_product_info(self):
         return {
             "caseFlag": "Y",
@@ -181,21 +181,21 @@ class MockUqRetriver:
 
 class TestUqProduct(unittest.TestCase):
     def test_uq_product_to_get_correct_product_name(self):
-        retriver = MockUqRetriver()
-        item = UqProduct(retriver)
+        retriever = MockUqRetriever()
+        item = UqProduct(retriever)
         self.assertEqual(item.name, "女裝 UNIQLO PLUS 針織外套 431318")
 
     def test_uq_product_to_get_correct_product_original_price(self):
-        retriver = MockUqRetriver()
-        item = UqProduct(retriver)
+        retriever = MockUqRetriever()
+        item = UqProduct(retriever)
         self.assertEqual(item.original_price, 2990)
 
     def test_uq_product_to_get_correct_product_special_offer(self):
-        retriver = MockUqRetriver()
-        item = UqProduct(retriver)
+        retriever = MockUqRetriever()
+        item = UqProduct(retriever)
         self.assertEqual(item.special_offer, 790)
 
     def test_uq_product_to_get_correct_product_is_on_sale(self):
-        retriver = MockUqRetriver()
-        item = UqProduct(retriver)
+        retriever = MockUqRetriever()
+        item = UqProduct(retriever)
         self.assertEqual(item.is_on_sale, True)
