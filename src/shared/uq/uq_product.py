@@ -69,6 +69,10 @@ class UqRetriever:
 
 
 class UqProduct:
+    """
+    A data model that represents a product. The data is loaded when it's required.
+    """
+
     _price_data: dict = None
     _product_data: dict = None
 
