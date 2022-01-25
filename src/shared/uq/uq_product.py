@@ -90,15 +90,7 @@ class UqProduct:
 
     @property
     def is_on_sale(self) -> bool:
-        if not self._product_data:
-            self._product_data = self.retriever.get_product_info()
-        try:
-            return (
-                self._product_data["priceColor"] == "red"
-                and self.special_offer < self.original_price
-            )
-        except KeyError as e:
-            raise UqProductException() from e
+        return self.special_offer < self.original_price
 
     @property
     def original_price(self) -> int:
@@ -115,10 +107,6 @@ class UqProduct:
             self._price_data = self.retriever.get_price_info()
         try:
             min_price: int = self._price_data["summary"]["minPrice"]
-            max_price: int = self._price_data["summary"]["maxPrice"]
-            if min_price != max_price:
-                # handle the min price and max price are different
-                pass
             return int(min_price)
         except KeyError as e:
             raise UqProductException() from e
