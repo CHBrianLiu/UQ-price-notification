@@ -8,6 +8,7 @@ class UqProductException(Exception):
 class UqRetriever:
     def __init__(self, product_code: str) -> None:
         self.product_code = product_code
+        self._session = session
 
     @property
     def _product_info_url(self) -> str:
@@ -27,7 +28,7 @@ class UqRetriever:
             AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
         }
         try:
-            resp = requests.get(url, headers=headers)
+            resp = self._session.get(url, headers=self._custom_headers)
             if not resp.ok:
                 raise UqProductException()
             return resp.json()
