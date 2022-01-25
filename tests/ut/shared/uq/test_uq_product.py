@@ -1,5 +1,7 @@
 import unittest
-from src.shared.uq.uq_product import UqProduct
+from unittest import mock
+
+from src.shared.uq.uq_product import UqProduct, UqRetriever, UqProductException
 
 
 class MockUqRetriever:
@@ -177,6 +179,56 @@ class MockUqRetriever:
                 },
             ],
         }
+
+
+class TestUqRetriever(unittest.TestCase):
+    def test_get_product_info_should_use_product_spu_url(self):
+        session = mock.MagicMock()
+
+        retriever = UqRetriever("product_code", session)
+        retriever.get_product_info()
+
+        session.get.assert_called_once_with(
+            "https://www.uniqlo.com/tw/data/products/spu/zh_TW/product_code.json",
+            headers=retriever._custom_headers,
+        )
+
+    def test_get_price_info_should_use_product_spu_pc_query_url(self):
+        session = mock.MagicMock()
+
+        retriever = UqRetriever("product_code", session)
+        retriever.get_price_info()
+
+        session.get.assert_called_once_with(
+            "https://d.uniqlo.com/tw/p/product/i/product/spu/pc/query/product_code/zh_TW",
+            headers=retriever._custom_headers,
+        )
+
+    def test_get_product_info_should_raise_uq_product_exception_when_request_not_succeeded(
+        self,
+    ):
+        session = mock.MagicMock()
+        response = mock.MagicMock()
+        response.ok = False
+        session.get.return_value = response
+
+        retriever = UqRetriever("product_code", session)
+
+        with self.assertRaises(UqProductException):
+            retriever.get_product_info()
+
+    def test_get_price_info_should_raise_uq_product_exception_when_request_not_succeeded(
+        self,
+    ):
+        session = mock.MagicMock()
+        response = mock.MagicMock()
+        response.ok = False
+        session.get.return_value = response
+
+        retriever = UqRetriever("product_code", session)
+
+        with self.assertRaises(UqProductException):
+            retriever.get_price_info()
 
 
 class TestUqProduct(unittest.TestCase):
