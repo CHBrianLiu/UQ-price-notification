@@ -1,3 +1,5 @@
+from typing import Callable
+
 import requests
 
 
@@ -73,16 +75,39 @@ class UqProduct:
     A data model that represents a product. The data is loaded when it's required.
     """
 
-    _price_data: dict = None
-    _product_data: dict = None
+    _price_data: dict
+
+    _product_data: dict
 
     def __init__(self, retriever: UqRetriever) -> None:
         self.retriever = retriever
 
+    def _require(self=None, *, field: str, populater: str):
+        """
+        As the data in this class is lazily loaded, we need to retrieve required data
+        before using it. This decorator can help simplify the code by specifying the
+        required data property and the method of UqRetriever to populate the data.
+        Args:
+            field: The required field.
+            populater: The method name from the UqRetriever to get the data.
+
+        Returns: decorator
+        """
+
+        def deco(f: Callable):
+            def wrapper(self: "UqProduct", *args, **kwargs):
+                if not hasattr(self, field) or getattr(self, field) is None:
+                    data = getattr(self.retriever, populater)()
+                    setattr(self, field, data)
+                return f(self, *args, **kwargs)
+
+            return wrapper
+
+        return deco
+
     @property
+    @_require(field="_product_data", populater="get_product_info")
     def name(self) -> str:
-        if not self._product_data:
-            self._product_data = self.retriever.get_product_info()
         try:
             return self._product_data["fullName"]
         except KeyError as e:
@@ -93,18 +118,16 @@ class UqProduct:
         return self.special_offer < self.original_price
 
     @property
+    @_require(field="_product_data", populater="get_product_info")
     def original_price(self) -> int:
-        if not self._product_data:
-            self._product_data = self.retriever.get_product_info()
         try:
             return int(self._product_data["originPrice"])
         except KeyError as e:
             raise UqProductException() from e
 
     @property
+    @_require(field="_price_data", populater="get_price_info")
     def special_offer(self) -> int:
-        if not self._price_data:
-            self._price_data = self.retriever.get_price_info()
         try:
             min_price: int = self._price_data["summary"]["minPrice"]
             return int(min_price)
