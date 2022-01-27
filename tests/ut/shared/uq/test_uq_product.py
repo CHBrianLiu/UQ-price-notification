@@ -235,19 +235,32 @@ class TestUqProduct(unittest.TestCase):
     def test_uq_product_to_get_correct_product_name(self):
         retriever = MockUqRetriever()
         item = UqProduct(retriever)
-        self.assertEqual(item.name, "女裝 UNIQLO PLUS 針織外套 431318")
+        self.assertEqual("女裝 UNIQLO PLUS 針織外套 431318", item.name)
 
     def test_uq_product_to_get_correct_product_original_price(self):
         retriever = MockUqRetriever()
         item = UqProduct(retriever)
-        self.assertEqual(item.original_price, 2990)
+        self.assertEqual(2990, item.original_price)
 
     def test_uq_product_to_get_correct_product_special_offer(self):
         retriever = MockUqRetriever()
         item = UqProduct(retriever)
-        self.assertEqual(item.special_offer, 790)
+        self.assertEqual(790, item.special_offer)
 
     def test_uq_product_to_get_correct_product_is_on_sale(self):
         retriever = MockUqRetriever()
         item = UqProduct(retriever)
-        self.assertEqual(item.is_on_sale, True)
+        self.assertEqual(True, item.is_on_sale)
+
+    def test_uq_product_to_get_correct_product_code(self):
+        retriever = MockUqRetriever()
+        item = UqProduct(retriever)
+        self.assertEqual("u0000000000242", item.product_code)
+
+    def test_uq_product_to_get_correct_product_url(self):
+        retriever = MockUqRetriever()
+        item = UqProduct(retriever)
+        self.assertEqual(
+            "https://www.uniqlo.com/tw/zh_TW/product-detail.html?productCode=u0000000000242",
+            item.website_url,
+        )

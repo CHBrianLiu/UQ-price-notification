@@ -133,3 +133,15 @@ class UqProduct:
             return int(min_price)
         except KeyError as e:
             raise UqProductException() from e
+
+    @property
+    @_require(field="_product_data", populater="get_product_info")
+    def product_code(self) -> str:
+        try:
+            return self._product_data["productCode"]
+        except KeyError as e:
+            raise UqProductException() from e
+
+    @property
+    def website_url(self) -> str:
+        return f"https://www.uniqlo.com/tw/zh_TW/product-detail.html?productCode={self.product_code}"
