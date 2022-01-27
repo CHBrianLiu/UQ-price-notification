@@ -9,6 +9,7 @@ uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
 psycopg2 = "*"
 line-bot-sdk = "*"
+requests = "*"
 
 [dev-packages]
 bpython = "*"
