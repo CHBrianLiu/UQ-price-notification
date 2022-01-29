@@ -15,12 +15,14 @@ class TestUqProductManagementTemplateMessageCreator(unittest.TestCase):
         product1.name = "product1"
         product1.product_code = "product_code1"
         product1.website_url = "https://abcd.com/product1"
-        product1.special_offer = 100
+        product1.is_on_sale = False
+        product1.original_price = 100
         product2 = mock.MagicMock()
         product2.name = "product2"
         product2.product_code = "product_code2"
         product2.website_url = "https://abcd.com/product2"
-        product2.special_offer = 200
+        product2.is_on_sale = False
+        product2.original_price = 200
 
         creator = UqProductManagementTemplateMessageCreator([product1, product2])
         message = creator.generate_products_carousel_template_message()
@@ -29,9 +31,9 @@ class TestUqProductManagementTemplateMessageCreator(unittest.TestCase):
 
         self.assertEquals(2, len(message.template.columns))
         self.assertEquals("product1", column1.title)
-        self.assertEquals("NT $100", column1.text)
+        self.assertEquals("NT$ 100", column1.text)
         self.assertEquals("product2", column2.title)
-        self.assertEquals("NT $200", column2.text)
+        self.assertEquals("NT$ 200", column2.text)
 
     def test_products_carousel_template_column_should_contain_go_website_and_removal_actions(
         self,
@@ -86,3 +88,18 @@ class TestUqProductManagementTemplateMessageCreator(unittest.TestCase):
 
         self.assertEquals("remove", removal_postback_data.action)
         self.assertEquals("product_code1", removal_postback_data.product_code)
+
+    def test_products_carousel_template_column_content_should_use_corrent_format_if_product_is_on_sale(self):
+        product1 = mock.MagicMock()
+        product1.name = "product1"
+        product1.product_code = "product_code1"
+        product1.website_url = "https://abcd.com/product1"
+        product1.is_on_sale = True
+        product1.original_price = 200
+        product1.special_offer = 100
+
+        creator = UqProductManagementTemplateMessageCreator([product1])
+        message = creator.generate_products_carousel_template_message()
+        column1 = message.template.columns[0]
+
+        self.assertEquals("原價：NT$ 200\n特價：NT$ 100", column1.text)

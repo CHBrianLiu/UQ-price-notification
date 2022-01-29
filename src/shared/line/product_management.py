@@ -25,7 +25,7 @@ class UqProductManagementTemplateMessageCreator:
 
     def _generate_product_carousel_column(self, product: UqProduct):
         card_title = product.name
-        card_text = f"NT ${product.special_offer}"
+        card_text = self._compose_card_content(product)
         go_website_button = self._generate_product_go_website_action(product)
         removal_button = self._generate_product_removal_action(product)
         return models.CarouselColumn(
@@ -50,3 +50,8 @@ class UqProductManagementTemplateMessageCreator:
         action_button_label = "前往官網"
         action_button_url = product.website_url
         return models.URIAction(label=action_button_label, uri=action_button_url)
+
+    def _compose_card_content(self, product: UqProduct):
+        if product.is_on_sale:
+            return f"原價：NT$ {product.original_price}\n特價：NT$ {product.special_offer}"
+        return f"NT$ {product.original_price}"
