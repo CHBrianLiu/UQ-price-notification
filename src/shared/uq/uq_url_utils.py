@@ -1,10 +1,15 @@
+import re
+
+
 class UqProductCodeParser:
-    _url: str
+    """
+    A class with can parse product code from UNIQLO url
+    """
 
-    def __init__(self, url: str):
-        self._url = url
+    def __init__(self):
+        self.pattern = re.compile(r"u[0-9]+")
 
-    def get_product_code_from_url(self) -> str | None:
+    def get_product_code_from_url(self, url: str) -> str | None:
         """
         Both desktop and mobile version urls are supported.
         Desktop url
@@ -12,4 +17,5 @@ class UqProductCodeParser:
         Mobile url
         https://m.uniqlo.com/tw/product?pid=u0000000009993
         """
-        pass
+        match = self.pattern.search(url)
+        return match.group() if match else None
