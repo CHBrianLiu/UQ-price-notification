@@ -1,5 +1,10 @@
-from sqlalchemy import orm
+import peewee
 
-Base = orm.declarative_base()
+from src import config
 
-from src.shared.db import Product, Role, Setting, User
+connection = peewee.PostgresqlDatabase(
+    config.DATABASE_NAME,
+    user=config.DATABASE_USER,
+    password=config.DATABASE_PASSWORD,
+    host=config.DATABASE_HOST,
+)
