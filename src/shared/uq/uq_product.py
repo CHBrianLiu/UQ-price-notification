@@ -171,7 +171,6 @@ class UqProduct:
     @_require(field="_image_data", populater="get_image_info")
     def image_url(self) -> str:
         try:
-            print(self._image_data)
             path = self._image_data["main561"][0]
             return f"https://www.uniqlo.com/tw{path}"
         except (KeyError, IndexError) as e:
