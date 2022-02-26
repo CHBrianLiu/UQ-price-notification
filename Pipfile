@@ -6,17 +6,16 @@ name = "pypi"
 [packages]
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
-sqlalchemy = "*"
 psycopg2 = "*"
 line-bot-sdk = "*"
 requests = "*"
+peewee = "*"
 
 [dev-packages]
 bpython = "*"
 pytype = "*"
 pylint = "*"
 black = "*"
-alembic = "*"
 
 [requires]
 python_version = "3.10"
