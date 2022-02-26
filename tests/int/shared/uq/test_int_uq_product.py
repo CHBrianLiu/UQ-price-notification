@@ -23,3 +23,12 @@ class TestIntUqRetriever(unittest.TestCase):
             product = UqProduct(retriever)
 
             self.assertEqual(190, product.original_price)
+
+    def test_retrieve_uq_product_image_from_website(self):
+        with requests.Session() as session:
+            # long-live product
+            retriever = UqRetriever("u0000000012397", session)
+
+            product = UqProduct(retriever)
+
+            self.assertRegex(product.image_url, r"^https:\/\/www\.uniqlo\.com\/tw\/.*u0000000012397.*\.jpg$")
