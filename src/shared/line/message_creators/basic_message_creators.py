@@ -16,3 +16,23 @@ class PriceDownNotificationMessageCreator(LineMessageCreator):
 class ProductUrlErrorMessageCreator(LineMessageCreator):
     def generate(self) -> models.TextMessage:
         return models.TextMessage(text="你所輸入的商品網址有誤，請重新輸入！")
+
+
+class ProductSuccessfullyAddedMessageCreator(LineMessageCreator):
+    product_name: str
+
+    def __init__(self, product_name: str):
+        self.product_name = product_name
+
+    def generate(self) -> models.TextMessage:
+        return models.TextMessage(text=f"已成功將{self.product_name}加入追蹤清單！")
+
+
+class ProductAlreadyInListMessageCreator(LineMessageCreator):
+    product_name: str
+
+    def __init__(self, product_name: str):
+        self.product_name = product_name
+
+    def generate(self) -> models.TextMessage:
+        return models.TextMessage(text=f"{self.product_name}已經在你的追蹤清單了喔！")
