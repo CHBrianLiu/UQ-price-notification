@@ -1,33 +1,11 @@
-import abc
-
 from linebot import models
 
-from src.shared.uq.uq_product import UqProduct
 from src.shared.line.carousel_column_creators import (
     UqProductManagementTemplateColumnCreator,
 )
+from src.shared.line.message_creators.base_creators import LineMessageCreator
 from src.shared.line.postback_action_models import ProductAddingConfirmationDataModel
-
-
-class LineMessageCreator(abc.ABC):
-    @abc.abstractmethod
-    def generate(self) -> models.Message:
-        pass
-
-
-class HelpMessageCreator(LineMessageCreator):
-    def generate(self) -> models.TextMessage:
-        return models.TextMessage(text="請傳送商品網址")
-
-
-class PriceDownNotificationMessageCreator(LineMessageCreator):
-    def generate(self) -> models.TextMessage:
-        return models.TextMessage(text="你好，你追蹤的商品正在特價中！把握機會購買吧！")
-
-
-class ProductUrlErrorMessageCreator(LineMessageCreator):
-    def generate(self) -> models.TextMessage:
-        return models.TextMessage(text="你所輸入的商品網址有誤，請重新輸入！")
+from src.shared.uq.uq_product import UqProduct
 
 
 class UqProductManagementTemplateFactory:
