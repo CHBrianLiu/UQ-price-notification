@@ -2,10 +2,12 @@ import linebot
 from linebot.models import MessageEvent, TextMessage, PostbackEvent
 import requests
 
-from src.shared.line.message_creators import (
-    HelpMessageCreator,
-    LineMessageCreator,
+from src.shared.line.message_creators.base_creators import LineMessageCreator
+from src.shared.line.message_creators.template_message_creators import (
     UqProductSubscriptionConfirmationMessageCreator,
+)
+from src.shared.line.message_creators.basic_message_creators import (
+    HelpMessageCreator,
     ProductUrlErrorMessageCreator,
 )
 from src import config
