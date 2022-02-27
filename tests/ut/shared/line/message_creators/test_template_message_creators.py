@@ -3,34 +3,16 @@ from unittest import mock
 
 from linebot import models
 
-from src.shared.line.message_creators import (
-    HelpMessageCreator,
-    PriceDownNotificationMessageCreator,
+from src.shared.line.message_creators.template_message_creators import (
     UqProductSubscriptionConfirmationMessageCreator,
     UqProductManagementTemplateMessageCreator,
 )
 from src.shared.line.postback_action_models import ProductAddingConfirmationDataModel
 
 
-class TestHelpMessageCreator(unittest.TestCase):
-    def test_help_message_should_contain_correct_message(self):
-        creator = HelpMessageCreator()
-        message = creator.generate()
-
-        self.assertEqual("請傳送商品網址", message.text)
-
-
-class TestPriceDownNotificationMessageCreator(unittest.TestCase):
-    def test_price_down_notification_message_should_contain_correct_message(self):
-        creator = PriceDownNotificationMessageCreator()
-        message = creator.generate()
-
-        self.assertEqual("你好，你追蹤的商品正在特價中！把握機會購買吧！", message.text)
-
-
 class TestUqProductSubscriptionConfirmationMessageCreator(unittest.TestCase):
     def test_product_subscription_confirmation_message_should_contain_product_info(
-            self,
+        self,
     ):
         product1 = mock.MagicMock()
         product1.name = "product1"
@@ -45,7 +27,7 @@ class TestUqProductSubscriptionConfirmationMessageCreator(unittest.TestCase):
         self.assertEqual("NT $100\n你要追蹤此商品嗎？", message.template.text)
 
     def test_product_subscription_confirmation_message_should_contain_yes_and_no_actions(
-            self,
+        self,
     ):
         product1 = mock.MagicMock()
         product1.name = "product1"
@@ -62,7 +44,7 @@ class TestUqProductSubscriptionConfirmationMessageCreator(unittest.TestCase):
         self.assertIsInstance(no_action, models.MessageAction)
 
     def test_product_subscription_confirmation_message_yes_action_should_contain_correct_postback_data(
-            self,
+        self,
     ):
         product1 = mock.MagicMock()
         product1.name = "product1"
@@ -87,7 +69,7 @@ class TestUqProductManagementTemplateMessageCreator(unittest.TestCase):
     """
 
     def test_generated_carousel_template_message_should_contain_product_columns(
-            self,
+        self,
     ):
         product1 = mock.MagicMock()
         product1.name = "product1"
