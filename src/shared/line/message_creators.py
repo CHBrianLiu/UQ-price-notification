@@ -25,6 +25,11 @@ class PriceDownNotificationMessageCreator(LineMessageCreator):
         return models.TextMessage(text="你好，你追蹤的商品正在特價中！把握機會購買吧！")
 
 
+class ProductUrlErrorMessageCreator(LineMessageCreator):
+    def generate(self) -> models.TextMessage:
+        return models.TextMessage(text="你所輸入的商品網址有誤，請重新輸入！")
+
+
 class UqProductManagementTemplateFactory:
     def get_uq_product_management_template_column_creator(self, *args, **kwargs):
         return UqProductManagementTemplateColumnCreator(*args, **kwargs)
