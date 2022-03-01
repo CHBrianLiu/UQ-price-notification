@@ -4,7 +4,9 @@ from src.shared.line.message_creators.basic_message_creators import (
     HelpMessageCreator,
     PriceDownNotificationMessageCreator,
     ProductSuccessfullyAddedMessageCreator,
-    ProductAlreadyInListMessageCreator
+    ProductAlreadyInListMessageCreator,
+    ProductNotInListYetMessageCreator,
+    ProductSuccessfullyRemovedMessageCreator,
 )
 
 
@@ -40,3 +42,20 @@ class TestProductAlreadyInListMessageCreator(unittest.TestCase):
         message = creator.generate()
 
         self.assertEqual("product_name已經在你的追蹤清單了喔！", message.text)
+
+
+class TestProductNotInListYetMessageCreator(unittest.TestCase):
+    def test_product_not_in_list_yet_message_should_contain_correct_message(self):
+        creator = ProductNotInListYetMessageCreator()
+        message = creator.generate()
+
+        self.assertEqual("你還沒追蹤此商品喔！", message.text)
+
+
+class TestProductSuccessfullyRemovedMessageCreator(unittest.TestCase):
+    def test_product_already_in_list_message_should_contain_correct_message(self):
+        product_name = "product_name"
+        creator = ProductSuccessfullyRemovedMessageCreator(product_name)
+        message = creator.generate()
+
+        self.assertEqual("已成功將product_name從清單移除！", message.text)
