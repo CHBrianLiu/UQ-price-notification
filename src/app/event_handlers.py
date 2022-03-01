@@ -13,6 +13,7 @@ from src.shared.line.message_creators.basic_message_creators import (
 from src import config
 from src.shared.uq.uq_url_utils import UqProductCodeParser
 from src.shared.uq import uq_product
+from src.app.postback_handlers import postback_dispatcher
 
 line_api = linebot.LineBotApi(config.LINE_CHANNEL_TOKEN, config.LINE_API_ENDPOINT)
 webhook_handler = linebot.WebhookHandler(config.LINE_CHANNEL_SECRET)
@@ -47,6 +48,9 @@ def generate_response_for_given_product_code(product_code: str) -> LineMessageCr
 
 
 @webhook_handler.add(PostbackEvent)
-def handle_postback_event(event: PostbackEvent):  # pylint: disable=W0613
-    # TODO: Postback event handling logic  pylint: disable=W0511
-    pass
+def handle_postback_event(event: PostbackEvent):
+    # Currently, only normal users can interact with our bot.
+    if event.source.type != "user":
+        return
+    response = postback_dispatcher.run_task(event.postback.data, event.source.user_id)
+    line_api.reply_message(event.reply_token, response)
