@@ -4,10 +4,14 @@ from unittest import mock
 
 from linebot import models
 
-from src.app.postback_handlers import ProductSubscriptionPostbackHandler
+from src.app.postback_handlers import (
+    ProductSubscriptionPostbackHandler,
+    ProductRemovalPostbackHandler,
+)
 from src.shared.line.postback_action_models import (
     ProductAddingConfirmationDataModel,
     PostbackDataException,
+    ProductRemovalPostbackDataModel,
 )
 
 
@@ -102,3 +106,72 @@ class TestProductSubscriptionPostbackHandler(unittest.TestCase):
 
         self.assertIsInstance(response, models.TextMessage)
         self.assertEqual(response.text, "已成功將name加入追蹤清單！")
+
+
+class TestProductRemovalPostbackHandler(unittest.TestCase):
+    def test_product_removal_postback_data_model_is_used_to_parse_data(self):
+        data = ProductRemovalPostbackDataModel(product_code="code")
+
+        handler = ProductSubscriptionPostbackHandler(data.json(), "user_id")
+
+        self.assertEqual(handler._data.action, "remove")
+        self.assertEqual(handler._data.product_code, "code")
+
+    @mock.patch("src.app.postback_handlers.UserDataRetriever")
+    @mock.patch("src.app.postback_handlers.User")
+    def test_execute_should_return_product_not_in_list_yet_message_if_product_not_in_list_yet(
+        self, mock_user: Type[mock.MagicMock], mock_retriever: Type[mock.MagicMock]
+    ):
+        """
+        We didn't mock ProductNotInListYetMessageCreator since 1) testing return value is
+        easier to maintain than testing interaction and 2) the side effect of the class is
+        limited.
+        """
+        # set up mock User to return a dummy user object
+        dummy_user = mock.MagicMock()
+        mock_user.get_or_create.return_value = (dummy_user, False)
+        # set up mock get_subscribed_products of UserDataRetriever class
+        user_data_retriever_instance = mock.MagicMock()
+        user_data_retriever_instance.get_subscribed_products.return_value = {}
+        mock_retriever.return_value = user_data_retriever_instance
+        # prepare postback data
+        data = ProductRemovalPostbackDataModel(product_code="product1")
+
+        response = ProductRemovalPostbackHandler(data.json(), "user_id").execute()
+
+        self.assertIsInstance(response, models.TextMessage)
+        self.assertEqual(response.text, "你還沒追蹤此商品喔！")
+
+    @mock.patch("src.app.postback_handlers.UserProduct")
+    @mock.patch("src.app.postback_handlers.Product")
+    @mock.patch("src.app.postback_handlers.UserDataRetriever")
+    @mock.patch("src.app.postback_handlers.User")
+    def test_execute_should_return_successful_operation_message_if_correctly_removing_the_product_from_list(
+        self,
+        mock_user: Type[mock.MagicMock],
+        mock_user_data_retriever: Type[mock.MagicMock],
+        mock_product: Type[mock.MagicMock],
+        mock_user_product: Type[mock.MagicMock],
+    ):
+        """
+        We didn't mock ProductSuccessfullyRemovedMessageCreator since 1) testing return value is
+        easier to maintain than testing interaction and 2) the side effect of the class is
+        limited.
+        """
+        dummy_user = mock.MagicMock()
+        mock_user.get_or_create.return_value = (dummy_user, False)
+        # set up mock get_subscribed_products of UserDataRetriever class
+        user_data_retriever_instance = mock.MagicMock()
+        product1 = mock.MagicMock()
+        product1.name = "product1"
+        user_data_retriever_instance.get_subscribed_products.return_value = {
+            "product1": product1,
+        }
+        mock_user_data_retriever.return_value = user_data_retriever_instance
+        # prepare postback data
+        data = ProductRemovalPostbackDataModel(product_code="product1")
+
+        response = ProductRemovalPostbackHandler(data.json(), "user_id").execute()
+
+        self.assertIsInstance(response, models.TextMessage)
+        self.assertEqual(response.text, "已成功將product1從清單移除！")
