@@ -35,3 +35,6 @@ class User(BaseModel):
 class UserProduct(BaseModel):
     user = peewee.ForeignKeyField(User)
     product = peewee.ForeignKeyField(Product)
+
+    class Meta:
+        primary_key = peewee.CompositeKey("user", "product")
