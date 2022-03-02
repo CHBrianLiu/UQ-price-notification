@@ -2,6 +2,7 @@ FROM python:3.10
 
 RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
+ENV PYTHONPATH /usr/src/app
 
 RUN pip install pipenv
 

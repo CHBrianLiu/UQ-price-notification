@@ -133,3 +133,6 @@ dmypy.json
 
 # application
 *local.env
+
+# pycharm
+.idea
