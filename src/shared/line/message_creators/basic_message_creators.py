@@ -36,3 +36,18 @@ class ProductAlreadyInListMessageCreator(LineMessageCreator):
 
     def generate(self) -> models.TextMessage:
         return models.TextMessage(text=f"{self.product_name}已經在你的追蹤清單了喔！")
+
+
+class ProductNotInListYetMessageCreator(LineMessageCreator):
+    def generate(self) -> models.TextMessage:
+        return models.TextMessage(text="你還沒追蹤此商品喔！")
+
+
+class ProductSuccessfullyRemovedMessageCreator(LineMessageCreator):
+    product_name: str
+
+    def __init__(self, product_name: str):
+        self.product_name = product_name
+
+    def generate(self) -> models.TextMessage:
+        return models.TextMessage(text=f"已成功將{self.product_name}從清單移除！")

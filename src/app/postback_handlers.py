@@ -2,12 +2,17 @@ import requests
 
 from src.app.postback_dispatcher import PostbackDispatcher
 from src.app.postback_handler_base import PostbackHandlerBase
-from src.shared.line.postback_action_models import ProductAddingConfirmationDataModel
+from src.shared.line.postback_action_models import (
+    ProductAddingConfirmationDataModel,
+    ProductRemovalPostbackDataModel,
+)
 from src.shared.db.models import User, Product, UserProduct
 from src.shared.db.utils import UserDataRetriever
 from src.shared.line.message_creators.basic_message_creators import (
     ProductAlreadyInListMessageCreator,
     ProductSuccessfullyAddedMessageCreator,
+    ProductNotInListYetMessageCreator,
+    ProductSuccessfullyRemovedMessageCreator,
 )
 from src.shared.uq.uq_product import UqProduct, UqRetriever
 
@@ -41,5 +46,31 @@ class ProductSubscriptionPostbackHandler(PostbackHandlerBase):
         UserProduct.create(user=user, product=product)
 
         return ProductSuccessfullyAddedMessageCreator(
+            product_name=product.name
+        ).generate()
+
+
+@postback_dispatcher.add("remove")
+class ProductRemovalPostbackHandler(PostbackHandlerBase):
+    _DATA_MODEL = ProductRemovalPostbackDataModel
+
+    def execute(self):
+        (user, _) = User.get_or_create(id=self._source_user_id, role_id=1)
+
+        product = (
+            UserDataRetriever(user)
+            .get_subscribed_products()
+            .get(self._data.product_code)
+        )
+        if product is None:
+            return ProductNotInListYetMessageCreator().generate()
+
+        # ! Potential performance enhancement - whole table deletion
+        UserProduct.delete().where(
+            (UserProduct.user == user.id)
+            & (UserProduct.product == product.product_code)
+        ).execute()
+
+        return ProductSuccessfullyRemovedMessageCreator(
             product_name=product.name
         ).generate()
