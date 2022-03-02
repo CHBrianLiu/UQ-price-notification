@@ -27,3 +27,6 @@ dev-up:
 
 dev-shell:
 	docker-compose -f dev.docker-compose.yaml exec uq-dev bash
+
+dev-down:
+	docker-compose -f dev.docker-compose.yaml down
