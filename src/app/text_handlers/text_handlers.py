@@ -1,10 +1,19 @@
 from linebot import models
+import requests
 
 from src.app.text_handlers.text_dispatcher import (
     ITextMessageHandler,
     TextMessageDispatcher,
 )
-from src.shared.line.message_creators.basic_message_creators import HelpMessageCreator
+from src.shared.line.message_creators.basic_message_creators import (
+    HelpMessageCreator,
+    ProductUrlErrorMessageCreator,
+)
+from src.shared.line.message_creators.template_message_creators import (
+    UqProductSubscriptionConfirmationMessageCreator,
+)
+from src.shared.uq.uq_url_utils import UqProductCodeParser
+from src.shared.uq.uq_product import UqRetriever, UqProduct, UqProductException
 
 text_message_dispatcher = TextMessageDispatcher()
 
@@ -30,3 +39,25 @@ class DefaultTextMessageHandler(TextMessageHandlerBase):
 
     def execute(self) -> models.Message:
         return HelpMessageCreator().generate()
+
+
+@text_message_dispatcher.add
+class ProductUrlTextMessageHandler(TextMessageHandlerBase):
+    @staticmethod
+    def is_command(message: str) -> bool:
+        return UqProductCodeParser(message).get_product_code_from_url() is not None
+
+    def execute(self) -> models.Message:
+        product_code = UqProductCodeParser(self._message).get_product_code_from_url()
+        try:
+            with requests.Session() as session:
+                retriever = UqRetriever(product_code, session)
+                product = UqProduct(retriever)
+                message = UqProductSubscriptionConfirmationMessageCreator(
+                    product
+                ).generate()
+
+        except UqProductException:
+            message = ProductUrlErrorMessageCreator().generate()
+
+        return message

@@ -8,6 +8,7 @@ from linebot.models import (
     TemplateSendMessage,
     ButtonsTemplate,
 )
+from linebot.models.sources import SourceUser
 
 from src.app.event_handlers import handle_text_message_event
 from src.shared.uq import uq_product
@@ -19,9 +20,10 @@ class TestTextMessageEventHandler(unittest.TestCase):
         with mock.patch.object(
             linebot.LineBotApi, "reply_message"
         ) as reply_message_method:
+            source = SourceUser("user_id")
             coming_message = TextMessage(text="nonsense message")
             message_event = MessageEvent(
-                message=coming_message, reply_token="reply_token"
+                message=coming_message, reply_token="reply_token", source=source
             )
 
             handle_text_message_event(message_event)
@@ -37,11 +39,12 @@ class TestTextMessageEventHandler(unittest.TestCase):
         with mock.patch.object(
             linebot.LineBotApi, "reply_message"
         ) as reply_message_method:
+            source = SourceUser("user_id")
             coming_message = TextMessage(
                 text="https://www.uniqlo.com/tw/zh_TW/product-detail.html?productCode=u0000000009993"
             )
             message_event = MessageEvent(
-                message=coming_message, reply_token="reply_token"
+                message=coming_message, reply_token="reply_token", source=source
             )
 
             handle_text_message_event(message_event)
@@ -62,11 +65,12 @@ class TestTextMessageEventHandler(unittest.TestCase):
         with mock.patch.object(
             linebot.LineBotApi, "reply_message"
         ) as reply_message_method:
+            source = SourceUser("user_id")
             coming_message = TextMessage(
                 text="https://m.uniqlo.com/tw/product?pid=u0000000009993"
             )
             message_event = MessageEvent(
-                message=coming_message, reply_token="reply_token"
+                message=coming_message, reply_token="reply_token", source=source
             )
 
             handle_text_message_event(message_event)
@@ -85,11 +89,12 @@ class TestTextMessageEventHandler(unittest.TestCase):
         with mock.patch.object(
             linebot.LineBotApi, "reply_message"
         ) as reply_message_method:
+            source = SourceUser("user_id")
             coming_message = TextMessage(
                 text="https://www.uniqlo.com/tw/zh_TW/product-detail.html?productCode=nonexisting"
             )
             message_event = MessageEvent(
-                message=coming_message, reply_token="reply_token"
+                message=coming_message, reply_token="reply_token", source=source
             )
 
             handle_text_message_event(message_event)
