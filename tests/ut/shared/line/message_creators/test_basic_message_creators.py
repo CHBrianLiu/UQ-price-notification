@@ -7,6 +7,7 @@ from src.shared.line.message_creators.basic_message_creators import (
     ProductAlreadyInListMessageCreator,
     ProductNotInListYetMessageCreator,
     ProductSuccessfullyRemovedMessageCreator,
+    NoSubscribedProductMessageCreator,
 )
 
 
@@ -59,3 +60,11 @@ class TestProductSuccessfullyRemovedMessageCreator(unittest.TestCase):
         message = creator.generate()
 
         self.assertEqual("已成功將product_name從清單移除！", message.text)
+
+
+class TestNoSubscribedProductMessageCreator(unittest.TestCase):
+    def test_no_subscribed_product_message_should_contain_correct_message(self):
+        creator = NoSubscribedProductMessageCreator()
+        message = creator.generate()
+
+        self.assertEqual("你沒有追蹤中的商品喔！", message.text)

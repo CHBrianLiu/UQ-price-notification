@@ -51,3 +51,8 @@ class ProductSuccessfullyRemovedMessageCreator(LineMessageCreator):
 
     def generate(self) -> models.TextMessage:
         return models.TextMessage(text=f"已成功將{self.product_name}從清單移除！")
+
+
+class NoSubscribedProductMessageCreator(LineMessageCreator):
+    def generate(self) -> models.Message:
+        return models.TextMessage(text="你沒有追蹤中的商品喔！")
